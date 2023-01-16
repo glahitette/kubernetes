@@ -2,7 +2,8 @@
 
 ## Shell setup
 
-- Use the [.bashrc](.bashrc_from_killercoda.com) example from killercoda.com, in particular:
+- Use the [.bashrc](.bashrc) file
+- :
 
 ```
 echo "alias c=clear" >> ~/.bashrc 
