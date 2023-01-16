@@ -38,6 +38,7 @@ k set image deployment/fish nginx=nginx:1.21.5
 ## Debugging
 
 - Use `k get pods [-A] [--show-labels]` to check the `STATUS` of all Pods in a Namespace, but also their `READY` and `RESTARTS` attributes.
+- Use `k get pod <pod_name> -o json | jq .status.phase` to get the status of a given pod
 - Use `k describe <resource_name>` to get detailed information about Kubernetes objects, including events.
 - Use `k logs <pod_name> [-c <container_name>]` to retrieve pod / container logs.
 - List events for a given namespace / all namespaces: `k get events -n <my-namespace>` / `k get events -A` 
@@ -56,8 +57,10 @@ k set image deployment/fish nginx=nginx:1.21.5
 
 ## YAML templates
 
-- Search YAML templates in documentation pages with `kind: <resource_name>`
-- Pod
+- Search YAML templates
+  - in documentation web pages with `kind: <resource_name>`
+  - on disk with `grep -r <search> [directory]`
+- Pod: [Tasks](https://kubernetes.io/docs/tasks/) > [Configure Pods and Containers](https://kubernetes.io/docs/tasks/configure-pod-container/), copy file URL then `wget <file_url>`and modify... 
 - Deployment
 - ConfiMap
 - Secret
