@@ -76,6 +76,35 @@ k set image deployment/fish nginx=nginx:1.21.5
 - Secret
 - Service
 
+## Helm
+
+- List release with `helm [-n my_namespace] ls [-a]`, example:
+```
+➜ helm -n mercury ls -a
+NAME                            NAMESPACE     STATUS          CHART           APP VERSION
+internal-issue-report-apache    mercury       deployed        apache-8.6.3    2.4.48     
+internal-issue-report-apiv2     mercury       deployed        nginx-9.5.2     1.21.1     
+internal-issue-report-app       mercury       deployed        nginx-9.5.0     1.21.1     
+internal-issue-report-daniel    mercury       pending-install nginx-9.5.0     1.21.1 
+```
+
+- Delete an installed release with `helm [-n my_namespace] uninstall <release_name>`
+- List / search repo:
+```
+helm repo list
+NAME    URL                               
+bitnami https://charts.bitnami.com/bitnami
+
+helm search repo nginx
+NAME                  CHART VERSION   APP VERSION     DESCRIPTION          
+bitnami/nginx         9.5.2           1.21.1          Chart for the nginx server             ...
+```
+- Upgrade a release, example `helm -n mercury upgrade internal-issue-report-apiv2 bitnami/nginx`
+
+- `helm rollback` for undoing a helm rollout/upgrade
+- Check customisable values setting for an install, e.g. `helm show values bitnami/apache [| yq e]`
+- Custom install example `helm -n mercury install internal-issue-report-apache bitnami/apache --set replicaCount=2`
+
 ## References
 - https://kubernetes.io/docs/reference/k/cheatsheet/
 - https://github.com/dennyzhang/cheatsheet-kubernetes-A4
