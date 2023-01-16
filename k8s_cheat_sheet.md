@@ -1,5 +1,12 @@
 # kubernetes cheat sheet
 
+## Setup
+
+```
+export do='--dry-run=client -o yaml'
+export now='--force --grace-period 0
+```
+
 ## Intro
 
 - Check all resources at once: `k get all [-A]`
@@ -8,14 +15,17 @@
 
 ## Create resources
 
+- Create an NGINX pod with `k run pod1 --image=nginx:stable [-n <my_namespace>]`
 - Create a pod YAML file with a volume backed by a config map, per https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#populate-a-volume-with-data-stored-in-a-configmap, then check the output of a key from the mounted volume
 ```
-export do='--dry-run=client -o yaml'
 k create -f https://kubernetes.io/examples/pods/pod-configmap-volume.yaml $do > pod.yml
 k exec chewie -n yoda -- cat /etc/starwars/planet
 ```
 
-- Create an nginx deployment YAML file: `export do='--dry-run=client -o yaml' && k create deployment sunny --image=nginx:stable $do > sunny_deployment.yml`
+- Create a job with `k -n neptune create job neb-new-job --image=busybox:1.31.0 $do > /opt/course/3/job.yaml -- sh -c "sleep 2 && echo done"`
+  - Namespace goes before the `create` keyword; command goes at the end 
+- Remember there is no such thing as starting a Job or CronJob! Check the pod execution...
+- Create an nginx deployment YAML file: `k create deployment sunny --image=nginx:stable $do > sunny_deployment.yml`
 
 - Create a Service: `k expose deployment <deploymentName> --port=<service-port> --target-port=<target-port> [--type ClusterIp|NodePort|...] [--dry-run=client -o yaml]`
 

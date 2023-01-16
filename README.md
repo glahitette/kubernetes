@@ -5,6 +5,7 @@
 - Use the [.bashrc](.bashrc_from_killercoda.com) example from killercoda.com, in particular:
 
 ```
+echo "alias c=clear" >> ~/.bashrc 
 echo "alias h=history" >> ~/.bashrc 
 echo "alias k=kubectl" >> ~/.bashrc 
 echo "source /etc/bash_completion" >> ~/.bashrc 

@@ -102,6 +102,7 @@ alias python3=/usr/bin/python3.8
 export PS1="\h $ "
 PATH=$PATH:/snap/bin
 alias h=history
+alias c=clear
 
 ###################################################### Kubernetes ######################################################
 alias k=kubectl
