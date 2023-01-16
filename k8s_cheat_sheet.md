@@ -15,7 +15,8 @@ export now='--force --grace-period 0
 
 ## Create resources
 
-- Create an NGINX pod with `k run pod1 --image=nginx:stable [-n <my_namespace>]`
+- Create an NGINX pod with `k [-n <my_namespace>] run pod1 --image=nginx:stable`
+- Create a busybox pod with `k [-n <my_namespace>] run pod6 --image=busybox:1.31.0 $do --command -- sh -c "touch /tmp/ready && sleep 1d" > 6.yaml`
 - Create a pod YAML file with a volume backed by a config map, per https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#populate-a-volume-with-data-stored-in-a-configmap, then check the output of a key from the mounted volume
 ```
 k create -f https://kubernetes.io/examples/pods/pod-configmap-volume.yaml $do > pod.yml
