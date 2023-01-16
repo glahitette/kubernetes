@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: resources-test-quota
+  namespace: resources-test
+spec:
+  hard:
+    requests.memory: 128Mi
+    requests.cpu: 500m
+    limits.memory: 256Mi
+    limits.cpu: "1"

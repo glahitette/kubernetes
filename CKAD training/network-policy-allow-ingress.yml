@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: np-test-client-allow
+  namespace: np-test-a
+spec:
+  podSelector:
+    matchLabels:
+      app: np-test-server
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            team: bteam
+        podSelector:
+          matchLabels:
+            app: np-test-client
+      ports:
+        - protocol: TCP
+          port: 80

@@ -1,0 +1,14 @@
+#  This setup uses a resource-consumer image that is designed to consume an approximate amount of CPU for testing
+#  purposes. Since it receives instructions via HTTP request, a sidecar container makes a request to the main container
+#  instructing it on how much CPU to consume.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: resource-consumer-pod
+spec:
+  containers:
+    - name: resource-consumer
+      image: gcr.io/kubernetes-e2e-test-images/resource-consumer:1.5
+    - name: busybox-sidecar
+      image: radial/busyboxplus:curl
+      command: ['sh', '-c', 'until curl localhost:8080/ConsumeCPU -d "millicores=100&durationSec=3600"; do sleep 5; done && while true; do sleep 10; done']

@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: np-test-client-allow-egress
+  namespace: np-test-b
+spec:
+  podSelector:
+    matchLabels:
+      app: np-test-client
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+      - namespaceSelector:
+          matchLabels:
+            team: ateam
+      ports:
+        - protocol: TCP
+          port: 80
