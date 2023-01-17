@@ -24,11 +24,12 @@ export now='--force --grace-period 0
 
 ## Create resources
 
+- Create a ConfigMap from a file, specifying the key: `k -n moon create configmap configmap-web-moon-html --from-file=index.html=/opt/course/15/web-moon.html # important to set the index.html key`
 - Create a secret (with implicit base64 encoding): `k -n moon create secret generic secret1 --from-literal user=test --from-literal pass=pwd`
 - Create an NGINX pod with `k [-n <my_namespace>] run pod1 --image=nginx:alpine [’--labels app=my_app]`
-- Create a temporary NGINX pod named tmp to check a service connection
+- Create a temporary NGINX pod named tmp to check a service connection every 5 seconds:
 ```
-k run tmp --restart=Never --rm --image=nginx:alpine -i -- curl http://project-plt-6cc-svc.pluto:3333
+k -n mars run tmp --restart=Never --rm -i --image=nginx:alpine -- watch -n 5 curl manager-api-svc:4444
 % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
 Dload  Upload   Total   Spent    Left  Speed
 100   612  100   612    0     0  32210      0 --:--:-- --:--:-- --:--:-- 32210
@@ -51,10 +52,12 @@ k exec chewie -n yoda -- cat /etc/starwars/planet
     - `expose` will create everything needed...much faster than creating a service and editing it to set the correct selector labels 
       - `k -n pluto create service clusterip project-plt-6cc-svc --tcp 3333:80 $do`
   - ...for an nginx deployment, which serves on port 80 and connects to the containers on port 8000: `k expose deployment nginx --port=80 --target-port=8000 [--type ClusterIp|NodePort|...] $do`
+- Note: A NodePort Service kind of lies on top of a ClusterIP one, making the ClusterIP Service reachable on the Node IPs (internal and external).
 
 ## Update resources
 
 - Add / remove a label: `k label pods my-pod new-label=awesome` / `k label pods my-pod new-label-`
+- Recreate the pods in a deployment: `k -n moon rollout restart deploy web-moon`
 - Perform a rolling update to change the image used in the fish Deployment to nginx:1.21.5 (2 options):
 ```
 k edit deployment fish
