@@ -24,6 +24,7 @@ export now='--force --grace-period 0
 
 ## Create resources
 
+- Create a secret (with implicit base64 encoding): `k -n moon create secret generic secret1 --from-literal user=test --from-literal pass=pwd`
 - Create an NGINX pod with `k [-n <my_namespace>] run pod1 --image=nginx:alpine [’--labels app=my_app]`
 - Create a temporary NGINX pod named tmp to check a service connection
 ```
@@ -67,6 +68,14 @@ k set image deployment/fish nginx=nginx:1.21.5
 - Delete a pod (with the `--force` flag) to apply a change: `k delete pod broken-pod --force`
 - Delete pods and services with label name=myLabel: `k delete pods,services -l name=myLabel`
 
+## Execute commands
+
+- Create a one-shot pod: `k run --image busybox --restart=Never -ti busybox --rm`
+- Execute commands on a running pod:
+  - `k -n moon exec secret-handler -- env | grep SECRET1`
+  - `k -n moon exec secret-handler -- cat /tmp/secret2/key`
+- Connect to an existing pod in interactive mode: `k exec <podName> -i sh`
+
 ## Debugging
 
 - Use `k get pods [-A] [--show-labels]` to check the `STATUS` of all Pods in a Namespace, but also their `READY` and `RESTARTS` attributes.
@@ -75,8 +84,6 @@ k set image deployment/fish nginx=nginx:1.21.5
 - Use `k logs <pod_name> [-c <container_name>]` to retrieve pod / container logs.
 - List events for a given namespace / all namespaces: `k get events -n <my-namespace>` / `k get events -A` 
 - Show metrics for pods / pod / nodes: `k top pods` / `k top pod --selector=XXXX=YYYY` / `k top node`
-- Create a one-shot pod: `k run --image busybox --restart=Never -ti busybox --rm`
-- Connect to an existing pod: `k exec <podName> -ti sh`
 - Repeat command every n seconds, example: `watch -n 2 kubectl get pods`
 - Check cluster-level logs if you still cannot locate any relevant information.
   - Check the kube-apiserver logs, e.g.
