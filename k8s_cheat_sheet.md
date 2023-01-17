@@ -23,7 +23,16 @@ export now='--force --grace-period 0
 
 ## Create resources
 
-- Create an NGINX pod with `k [-n <my_namespace>] run pod1 --image=nginx:stable`
+- Create an NGINX pod with `k [-n <my_namespace>] run pod1 --image=nginx:alpine [’--labels app=my_app]`
+- Create a temporary NGINX pod named tmp to check a service connection
+```
+k run tmp --restart=Never --rm --image=nginx:alpine -i -- curl http://project-plt-6cc-svc.pluto:3333
+% Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+Dload  Upload   Total   Spent    Left  Speed
+100   612  100   612    0     0  32210      0 --:--:-- --:--:-- --:--:-- 32210
+...
+<title>Welcome to nginx!</title>
+```
 - Create a busybox pod with `k [-n <my_namespace>] run pod6 --image=busybox:1.31.0 $do --command -- sh -c "touch /tmp/ready && sleep 1d" > 6.yaml`
 - Create a pod YAML file with a volume backed by a config map, per https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#populate-a-volume-with-data-stored-in-a-configmap, then check the output of a key from the mounted volume
 ```
@@ -34,9 +43,12 @@ k exec chewie -n yoda -- cat /etc/starwars/planet
 - Create a job with `k -n neptune create job neb-new-job --image=busybox:1.31.0 $do > /opt/course/3/job.yaml -- sh -c "sleep 2 && echo done"`
   - Namespace goes before the `create` keyword; command goes at the end 
 - Remember there is no such thing as starting a Job or CronJob! Check the pod execution...
-- Create an nginx deployment YAML file: `k create deployment sunny --image=nginx:stable $do > sunny_deployment.yml`
-
-- Create a Service: `k expose deployment <deploymentName> --port=<service-port> --target-port=<target-port> [--type ClusterIp|NodePort|...] [--dry-run=client -o yaml]`
+- Create an nginx deployment: `k create deployment sunny --image=nginx:stable $do > sunny_deployment.yml` (deployment name is used as prefix for pods' name)
+- Create a Service...
+  - ...to expose a given pod `k -n pluto expose pod project-plt-6cc-api --name project-plt-6cc-svc --port 3333 --target-port 80`
+    - `expose` will create everything needed...much faster than creating a service and editing it to set the correct selector labels 
+      - `k -n pluto create service clusterip project-plt-6cc-svc --tcp 3333:80 $do`
+  - ...for an nginx deployment, which serves on port 80 and connects to the containers on port 8000: `k expose deployment nginx --port=80 --target-port=8000 [--type ClusterIp|NodePort|...] $do`
 
 ## Update resources
 
