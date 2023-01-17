@@ -44,13 +44,14 @@ export now='--force --grace-period 0
 - Create a ConfigMap from a file, specifying the key: `k -n moon create configmap configmap-web-moon-html --from-file=index.html=/opt/course/15/web-moon.html # important to set the index.html key`
 - Create a secret (with implicit base64 encoding): `k -n moon create secret generic secret1 --from-literal user=test --from-literal pass=pwd`
 - Create an NGINX pod with `k [-n <my_namespace>] run pod1 --image=nginx:alpine [’--labels app=my_app]`
-- Create a temporary NGINX pod named tmp to check a service connection every 5 seconds:
+- Create a temporary NGINX pod named tmp to check a service connection:
+  - Because the Service is in a different Namespace from the test pod, it is reachable using the names sun-srv.sun or fully: sun-srv.sun.svc.cluster.local.
 ```
-k -n mars run tmp --restart=Never --rm -i --image=nginx:alpine -- watch -n 5 curl manager-api-svc:4444
-% Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-Dload  Upload   Total   Spent    Left  Speed
-100   612  100   612    0     0  32210      0 --:--:-- --:--:-- --:--:-- 32210
-...
+k run tmp --restart=Never --rm -i --image=nginx:alpine -- curl -m 5 sun-srv.sun:9999
+Connecting to sun-srv.sun:9999 (10.23.253.120:9999)
+<!DOCTYPE html>
+<html>
+<head>
 <title>Welcome to nginx!</title>
 ```
 - Create a busybox pod with `k [-n <my_namespace>] run pod6 --image=busybox:1.31.0 $do --command -- sh -c "touch /tmp/ready && sleep 1d" > 6.yaml`
