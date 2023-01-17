@@ -1,5 +1,13 @@
 # kubernetes cheat sheet
 
+## vi
+
+To indent multiple lines:
+- set the shiftwidth using :set shiftwidth=2
+- mark multiple lines using **Shift v** and the up/down keys
+- press `>` or `<`
+- repeat / cancel the action using `.` / `u`
+
 ## Setup
 
 ```
