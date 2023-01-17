@@ -114,5 +114,9 @@ export now="--force --grace-period 0"   # k delete pod x $now
 
 # From https://kubernetes.io/docs/reference/kubectl/cheatsheet/#kubectl-context-and-configuration
 # alias to set/show context/namespace (current context to be set before using kn to set namespace)
-alias kx='f() { [ "$1" ] && kubectl config use-context $1 || kubectl config current-context ; } ; f'
-alias kn='f() { [ "$1" ] && kubectl config set-context --current --namespace $1 || kubectl config view --minify | grep namespace | cut -d" " -f6 ; } ; f'
+# alias kx='f() { [ "$1" ] && kubectl config use-context $1 || kubectl config current-context ; } ; f'
+# alias kn='f() { [ "$1" ] && kubectl config set-context --current --namespace $1 || kubectl config view --minify | grep namespace | cut -d" " -f6 ; } ; f'
+
+# From https://killer.sh/attendee/81c36324-7266-459e-9c96-72be3ac10053/content
+alias kn='kubectl config set-context --current --namespace ' # switch namespace with kn default or kn my-namespace
+
