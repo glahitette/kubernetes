@@ -1,5 +1,22 @@
 # kubernetes cheat sheet
 
+<!-- TOC -->
+* [kubernetes cheat sheet](#kubernetes-cheat-sheet)
+  * [Linux](#linux)
+  * [Setup](#setup)
+  * [General](#general)
+  * [Create resources](#create-resources)
+  * [Update resources](#update-resources)
+  * [Delete / replace resources](#delete--replace-resources)
+  * [Execute commands](#execute-commands)
+  * [Debugging](#debugging)
+  * [YAML templates](#yaml-templates)
+  * [Secrets for ServiceAccount](#secrets-for-serviceaccount)
+  * [NetworkPolicy](#networkpolicy)
+  * [Helm](#helm)
+  * [References](#references)
+<!-- TOC -->
+
 ## Linux
 
 - In vi / vim, to indent multiple lines:
@@ -16,7 +33,7 @@ export do='--dry-run=client -o yaml'
 export now='--force --grace-period 0
 ```
 
-## Intro
+## General
 
 - Check all resources at once: `k get all [-A]`
 - Select the acgk8s cluster to interact: `k config use-context acgk8s`
@@ -128,6 +145,36 @@ Data
 ====
 token:      eyJhbGciOiJSUzI1NiIsImtpZCI6Im5aZFdqZDJ2aGNvQ3BqWHZOR1g1b3pIcm5JZ0hHNWxTZkwzQnFaaTFad2MifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJuZXB0dW5lIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6Im5lcHR1bmUtc2EtdjItdG9rZW4tZnE5MmoiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoibmVwdHVuZS1zYS12MiIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6IjY2YmRjNjM2LTJlYzMtNDJhZC04OGE1LWFhYzFlZjZlOTZlNSIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDpuZXB0dW5lOm5lcHR1bmUtc2EtdjIifQ.VYgboM4CTd0pdCJ78wjUwmtalh-2vsKjANyPsh-6guEwOtWEq5Fbw5ZHPtvAdrLlPzpOHEbAe4eUM95BRGWbYIdwjuN95J0D4RNFkVUt48twoakRV7h-aPuwsQXHhZZzy4yimFHG9Ufmsk5Yr4RVcG6n137y-FH08K8zZjIPAsKDqNBQtxg-lZvwVMi6viIhrrzAQs0MBOV82OJYGy2o-WQVc0UUanCf94Y3gT0YTiqQvczYMs6nz9ut-XgwitrBY6Tj9BgPprA9k_j5qEx_LUUZUpPAiEN7OzdkJsI8ctth10lypI1AeFr43t6ALyrQoBM39abDfq3FksR-oc_WMw
 ca.crt:     ...
+```
+
+## NetworkPolicy
+
+- Example of egress policy:
+  - restricting outgoing tcp connections from Deployment frontend and only allows those going to Deployment api
+  - still allowing outgoing traffic on UDP/TCP ports 53 for DNS resolution.
+ 
+```
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+name: np1
+namespace: venus
+spec:
+podSelector:
+matchLabels:
+id: frontend          # label of the pods this policy should be applied on
+policyTypes:
+- Egress                  # we only want to control egress
+  egress:
+- to:                     # 1st egress rule
+  - podSelector:            # allow egress only to pods with api label
+    matchLabels:
+    id: api
+- ports:                  # 2nd egress rule
+  - port: 53                # allow DNS UDP
+    protocol: UDP
+  - port: 53                # allow DNS TCP
+    protocol: TCP
 ```
 
 ## Helm
