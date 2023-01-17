@@ -1,12 +1,13 @@
 # kubernetes cheat sheet
 
-## vi
+## Linux
 
-To indent multiple lines:
-- set the shiftwidth using :set shiftwidth=2
-- mark multiple lines using **Shift v** and the up/down keys
-- press `>` or `<`
-- repeat / cancel the action using `.` / `u`
+- In vi / vim, to indent multiple lines:
+  - set the shiftwidth using :set shiftwidth=2
+  - mark multiple lines using **Shift v** and the up/down keys
+  - press `>` or `<`
+  - repeat / cancel the action using `.` / `u`
+- Use `grep -A2 Mounts` to show two lines after the line matching `Mounts`
 
 ## Setup
 
