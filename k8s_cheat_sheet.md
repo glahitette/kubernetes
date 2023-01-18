@@ -3,7 +3,6 @@
 <!-- TOC -->
 * [kubernetes cheat sheet](#kubernetes-cheat-sheet)
   * [Linux](#linux)
-  * [Setup](#setup)
   * [General](#general)
   * [Create resources](#create-resources)
   * [Update resources](#update-resources)
@@ -25,13 +24,6 @@
   - press `>` or `<`
   - repeat / cancel the action using `.` / `u`
 - Use `grep -A2 Mounts` to show two lines after the line matching `Mounts`
-
-## Setup
-
-```
-export do='--dry-run=client -o yaml'
-export now='--force --grace-period 0
-```
 
 ## General
 
