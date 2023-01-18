@@ -107,37 +107,30 @@ k set image deployment/fish nginx=nginx:1.21.5
   - for applications at https://kubernetes.io/docs/tasks/debug/debug-application/
   - for clusters at https://kubernetes.io/docs/tasks/debug/debug-cluster/
 
-## YAML templates
+[//]: # (## YAML templates)
 
-- Search YAML templates
-  - in documentation web pages with `kind: <resource_name>`
-  - on disk with `grep -r <search> [directory]`
-- Pod: [Tasks](https://kubernetes.io/docs/tasks/) > [Configure Pods and Containers](https://kubernetes.io/docs/tasks/configure-pod-container/), copy file URL then `wget <file_url>`and modify... 
-- Deployment
-- ConfiMap
-- Secret
-- Service
+[//]: # ()
+[//]: # (- Search YAML templates)
+
+[//]: # (  - in documentation web pages with `kind: <resource_name>`)
+
+[//]: # (  - on disk with `grep -r <search> [directory]`)
+
+[//]: # (- Pod: [Tasks]&#40;https://kubernetes.io/docs/tasks/&#41; > [Configure Pods and Containers]&#40;https://kubernetes.io/docs/tasks/configure-pod-container/&#41;, copy file URL then `wget <file_url>`and modify... )
+
+[//]: # (- Deployment)
+
+[//]: # (- ConfiMap)
+
+[//]: # (- Secret)
+
+[//]: # (- Service)
 
 ## Secrets for ServiceAccount
 
 - If a Secret belongs to a ServiceAccount, it'll have the annotation `kubernetes.io/service-account.name`
-- To show the base64 encoded token:
-```
-k -n neptune get secret neptune-secret-1 -o yaml
-apiVersion: v1
-data: ...
-token: ZXlKa...13
-kind: Secret ...
-```
- 
-- To get the base64 decoded token, one we could pipe it manually through `echo <token> | base64 -d -` or we simply do:
-```
-k -n neptune describe secret neptune-secret-1
-Data
-====
-token:      eyJhb...Mw
-ca.crt:     ...
-```
+- To get the base64 encoded token: `k -n neptune get secret neptune-secret-1 -o yaml`
+- To get the base64 decoded token, pipe it manually through `echo <token> | base64 -d -` or `k -n neptune describe secret neptune-secret-1`
 
 ## NetworkPolicy
 
@@ -149,38 +142,29 @@ ca.crt:     ...
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-name: np1
-namespace: venus
+  name: np1
+  namespace: venus
 spec:
-podSelector:
-matchLabels:
-id: frontend          # label of the pods this policy should be applied on
-policyTypes:
-- Egress                  # we only want to control egress
-  egress:
-- to:                     # 1st egress rule
-  - podSelector:            # allow egress only to pods with api label
+  podSelector:
     matchLabels:
-    id: api
-- ports:                  # 2nd egress rule
-  - port: 53                # allow DNS UDP
-    protocol: UDP
-  - port: 53                # allow DNS TCP
-    protocol: TCP
+      id: frontend          # label of the pods this policy should be applied on
+  policyTypes:
+  - Egress                  # we only want to control egress
+  egress:
+  - to:                     # 1st egress rule
+    - podSelector:            # allow egress only to pods with api label
+      matchLabels:
+      id: api
+  - ports:                  # 2nd egress rule
+    - port: 53                # allow DNS UDP
+      protocol: UDP
+    - port: 53                # allow DNS TCP
+      protocol: TCP
 ```
 
 ## Helm
 
-- List release with `helm [-n my_namespace] ls [-a]`, example:
-```
-➜ helm -n mercury ls -a
-NAME                            NAMESPACE     STATUS          CHART           APP VERSION
-internal-issue-report-apache    mercury       deployed        apache-8.6.3    2.4.48     
-internal-issue-report-apiv2     mercury       deployed        nginx-9.5.2     1.21.1     
-internal-issue-report-app       mercury       deployed        nginx-9.5.0     1.21.1     
-internal-issue-report-daniel    mercury       pending-install nginx-9.5.0     1.21.1 
-```
-
+- List release with `helm [-n my_namespace] ls [-a]`
 - Delete an installed release with `helm [-n my_namespace] uninstall <release_name>`
 - List / search repo:
 ```
@@ -193,7 +177,6 @@ NAME                  CHART VERSION   APP VERSION     DESCRIPTION
 bitnami/nginx         9.5.2           1.21.1          Chart for the nginx server             ...
 ```
 - Upgrade a release, example `helm -n mercury upgrade internal-issue-report-apiv2 bitnami/nginx`
-
 - `helm rollback` for undoing a helm rollout/upgrade
 - Check customisable values setting for an install, e.g. `helm show values bitnami/apache [| yq e]`
 - Custom install example `helm -n mercury install internal-issue-report-apache bitnami/apache --set replicaCount=2`
