@@ -96,6 +96,37 @@ spec:
 - Undo a helm rollout/upgrade: `helm rollback`
 - Delete an installed release with `helm uninstall <release_name>`
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 [//]: # (### Debugging - part 2)
 [//]: # (- Check cluster-level logs if you still cannot locate any relevant information.)
 [//]: # (  - Check the kube-apiserver logs, e.g.)
