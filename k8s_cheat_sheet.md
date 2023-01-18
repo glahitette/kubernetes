@@ -1,16 +1,13 @@
-# kubernetes cheat sheet
-
 <!-- TOC -->
-* [kubernetes cheat sheet](#kubernetes-cheat-sheet)
-  * [General](#general)
-  * [Create resources](#create-resources)
-  * [Update resources](#update-resources)
-  * [Delete / replace resources](#delete--replace-resources)
-  * [Execute commands](#execute-commands)
-  * [Debugging](#debugging)
-  * [Secrets for ServiceAccount](#secrets-for-serviceaccount)
-  * [NetworkPolicy](#networkpolicy)
-  * [Helm](#helm)
+* [General](#general)
+* [Create resources](#create-resources)
+* [Update resources](#update-resources)
+* [Execute commands](#execute-commands)
+* [Debugging](#debugging)
+* [Delete / replace resources](#delete--replace-resources)
+* [Secrets for ServiceAccount](#secrets-for-serviceaccount)
+* [NetworkPolicy](#networkpolicy)
+* [Helm](#helm)
 <!-- TOC -->
 
 [//]: # (## Linux)
@@ -21,14 +18,15 @@
 [//]: # (  - press `>` or `<`)
 [//]: # (  - repeat / cancel the action using `.` / `u`)
 
-## General
+# General
 
 - Use `grep -A2 Mounts` to show two lines after the line matching `Mounts`
+- Repeat command every n seconds, example: `watch -n 2 kubectl get pods`
 - Check all resources at once: `k get all [-A]`
 - Select the acgk8s cluster to interact: `k config use-context acgk8s`
 - API e.g. for pod manifests : `k explain pods[.child1.child2] | more` OR https://kubernetes.io/docs/reference/kubernetes-api/
 
-## Create resources
+# Create resources
 
 - Create a ConfigMap from a file, specifying the key: `k -n moon create configmap configmap-web-moon-html --from-file=index.html=/opt/course/15/web-moon.html # important to set the index.html key`
 - Create a secret (with implicit base64 encoding): `k -n moon create secret generic secret1 --from-literal user=test --from-literal pass=pwd`
@@ -56,7 +54,7 @@ k exec chewie -n yoda -- cat /etc/starwars/planet
   - ...for an nginx deployment, which serves on port 80 and connects to the containers on port 8000: `k expose deployment nginx --port=80 --target-port=8000 [--type ClusterIp|NodePort|...] $do`
 - Note: A NodePort Service kind of lies on top of a ClusterIP one, making the ClusterIP Service reachable on the Node IPs (internal and external).
 
-## Update resources
+# Update resources
 
 - Add / remove a label: `k label pods my-pod new-label=awesome` / `k label pods my-pod new-label-`
 - Recreate the pods in a deployment: `k -n moon rollout restart deploy web-moon`
@@ -68,12 +66,7 @@ k set image deployment/fish nginx=nginx:1.21.5
 - Check rollout status: `k rollout status deployment/rolling-deployment`
 - Roll back to the previous version: `k rollout undo deployment/rolling-deployment`
 
-## Delete / replace resources
-- Force replace, delete and then re-create the resource: `k replace --force -f ./pod.json`
-- Delete a pod (with the `--force` flag) to apply a change: `k delete pod broken-pod --force`
-- Delete pods and services with label name=myLabel: `k delete pods,services -l name=myLabel`
-
-## Execute commands
+# Execute commands
 
 - Create a one-shot pod: `k run --image busybox --restart=Never -ti busybox --rm`
 - Execute commands on a running pod:
@@ -81,7 +74,7 @@ k set image deployment/fish nginx=nginx:1.21.5
   - `k -n moon exec secret-handler -- cat /tmp/secret2/key`
 - Connect to an existing pod in interactive mode: `k exec <podName> -i sh`
 
-## Debugging
+# Debugging
 
 - Use `k get pods [-A] [--show-labels]` to check the `STATUS` of all Pods in a Namespace, but also their `READY` and `RESTARTS` attributes.
 - Use `k get pod <pod_name> -o json | jq .status.phase` to get the status of a given pod
@@ -89,7 +82,6 @@ k set image deployment/fish nginx=nginx:1.21.5
 - Use `k logs <pod_name> [-c <container_name>]` to retrieve pod / container logs.
 - List events for a given namespace / all namespaces: `k get events -n <my-namespace>` / `k get events -A` 
 - Show metrics for pods / pod / nodes: `k top pods` / `k top pod --selector=XXXX=YYYY` / `k top node`
-- Repeat command every n seconds, example: `watch -n 2 kubectl get pods`
 - Check cluster-level logs if you still cannot locate any relevant information.
   - Check the kube-apiserver logs, e.g.
     `sudo tail -100f /var/log/containers/kube-apiserver-k8s-control_kube-system_kube-apiserver-<hash>.log`
@@ -99,7 +91,11 @@ k set image deployment/fish nginx=nginx:1.21.5
   - for applications at https://kubernetes.io/docs/tasks/debug/debug-application/
   - for clusters at https://kubernetes.io/docs/tasks/debug/debug-cluster/
 
-[//]: # (## YAML templates)
+# Delete / replace resources
+- Force replace, delete and then re-create the resource: `k replace --force -f ./pod.json`
+- Delete pods and services with label name=myLabel: `k delete pods,services -l name=myLabel $now`
+
+[//]: # (# YAML templates)
 [//]: # ()
 [//]: # (- Search YAML templates)
 [//]: # (  - in documentation web pages with `kind: <resource_name>`)
@@ -110,13 +106,13 @@ k set image deployment/fish nginx=nginx:1.21.5
 [//]: # (- Secret)
 [//]: # (- Service)
 
-## Secrets for ServiceAccount
+# Secrets for ServiceAccount
 
 - If a Secret belongs to a ServiceAccount, it'll have the annotation `kubernetes.io/service-account.name`
 - To get the base64 encoded token: `k -n neptune get secret neptune-secret-1 -o yaml`
 - To get the base64 decoded token, pipe it manually through `echo <token> | base64 -d -` or `k -n neptune describe secret neptune-secret-1`
 
-## NetworkPolicy
+# NetworkPolicy
 
 - Example of egress policy:
   - restricting outgoing tcp connections from Deployment frontend and only allows those going to Deployment api
@@ -146,7 +142,7 @@ spec:
       protocol: TCP
 ```
 
-## Helm
+# Helm
 
 - List release with `helm [-n my_namespace] ls [-a]`
 - Delete an installed release with `helm [-n my_namespace] uninstall <release_name>`
@@ -165,7 +161,7 @@ bitnami/nginx         9.5.2           1.21.1          Chart for the nginx server
 - Check customisable values setting for an install, e.g. `helm show values bitnami/apache [| yq e]`
 - Custom install example `helm -n mercury install internal-issue-report-apache bitnami/apache --set replicaCount=2`
 
-[//]: # (## References)
+[//]: # (# References)
 [//]: # (- https://kubernetes.io/docs/reference/k/cheatsheet/)
 [//]: # (- https://github.com/dennyzhang/cheatsheet-kubernetes-A4)
 [//]: # (- https://codefresh.io/blog/kubernetes-cheat-sheet/)
