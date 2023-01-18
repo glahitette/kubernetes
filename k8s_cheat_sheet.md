@@ -12,14 +12,14 @@
 
 ### General
 - Use `grep -A2 Mounts` to show two lines after the line matching `Mounts`
-- Watch pods / deployments: `k get pods -w` / `k get deployments -w`
+- Watch pods / deployments / jobs: `k get pods -w` / `k get deployments -w` / `k get jobs -w`
 - Repeat command every n seconds, example: `watch -n 2 kubectl get pods`
 - Check all resources at once: `k get all [-A]`
 - Select the acgk8s cluster to interact: `k config use-context acgk8s`
 - API e.g. for pod manifests : `k explain pods[.child1.child2] | more` OR https://kubernetes.io/docs/reference/kubernetes-api/
 
 ### Create pods
-- Create an nginx pod with `k run my-pod --image=nginx:alpine [’--labels app=my_app]`
+- Create an nginx pod with `k run my-pod --image=nginx:alpine [--port=80] [’--labels app=my_app]`
 - Create a busybox pod with `k run my-pod --image=busybox $do --command -- sh -c "touch /tmp/ready && sleep 1d" > pod6.yml`
 - Create a pod with a volume backed by a config map: `k create -f https://kubernetes.io/examples/pods/pod-configmap-volume.yaml $do > pod.yml`
 - Create a one-shot pod:
@@ -42,20 +42,25 @@ Connecting to sun-srv.sun:9999 (10.23.253.120:9999)
 - Create an nginx deployment: `k create deployment my-dep --image=nginx:stable $do > my-dep.yml` (deployment name is used as prefix for pods' name)
 - Create a Service...
   - ...to expose a given pod `k expose pod my-pod --name my-svc --port 3333 --target-port 80` (much faster than creating a service and editing it to set the correct selector labels) 
-  - ...for an nginx deployment, which serves on port 80 and connects to the containers on port 8000: `k expose deployment nginx --port=80 --target-port=8000 [--type ClusterIp|NodePort|...] $do`
+  - ...for an nginx deployment, which serves on port 80 and connects to the containers on port 8000: `k expose deployment nginx --port=80 --target-port=8000 [--type ClusterIp|NodePort|...] [$do]`
 - Note: A NodePort Service kind of lies on top of a ClusterIP one, making the ClusterIP Service reachable on the Node IPs (internal and external).
+- Create a quota: `k create quota my-quota --hard=cpu=1,memory=1G,pods=2,services=3,replicationcontrollers=2,resourcequotas=1,secrets=5,persistentvolumeclaims=10 [$do]`
 
 ### Update resources
-- Add / remove a label: `k label pods my-pod app=b` / `k label pods my-pod app-`
+- Add / remove / change a label: `k label pods my-pod app=b` / `k label pods my-pod app-` / `k label pods my-pod app=v2 --overwrite`
+- Add a new label tier=web to all pods having 'app=v2' or 'app=v1' labels: `k label po -l "app in(v1,v2)" tier=web`
+- Change a pod's image (to nginx:1.7.1): `k set image my-pod nginx=nginx:1.7.1`
 - Recreate the pods in a deployment: `k rollout restart deploy web-moon`
 - Perform a rolling update (e.g. to change an image): `k edit deployment fish` or `k set image deployment/fish nginx=nginx:1.21.5`
 - Check rollout status: `k rollout status deployment/rolling-deployment`
 - Roll back to the previous version: `k rollout undo deployment/rolling-deployment`
+- Autoscale a deployment, pods between 5 and 10, targetting CPU utilization at 80%: `k autoscale deploy nginx --min=5 --max=10 --cpu-percent=80`
+  - View the Horizontal Pod Autoscalers (hpa): `k get hpa nginx` 
 
 ### Debugging
 - Use `k get pods [-A] [--show-labels]`: check `STATUS`, `READY` and `RESTARTS` attributes.
 - Retrieve a pod status: `k get pod <pod_name> -o json | jq .status.phase`
-- Retrieve pod / container logs: `k logs <pod_name> [-c <container_name>]`
+- Retrieve pod / container logs: `k logs <pod_name> [-c <container_name>] [-p]` (if pod crashed and restarted, -p option gets logs about the previous instance)
 - List events for a given namespace / all namespaces: `k get events -n <my-namespace>` / `k get events -A` 
 - Show metrics for pods / pod / nodes: `k top pods` / `k top pod --selector=XXXX=YYYY` / `k top node`
 
