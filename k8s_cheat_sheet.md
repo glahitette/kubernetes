@@ -18,61 +18,54 @@
 - API e.g. for pod manifests : `k explain pods[.child1.child2] | more` OR https://kubernetes.io/docs/reference/kubernetes-api/
 
 ### Create resources
-- Create a ConfigMap from a file, specifying the key: `k -n moon create configmap configmap-web-moon-html --from-file=index.html=/opt/course/15/web-moon.html # important to set the index.html key`
-- Create a secret (with implicit base64 encoding): `k -n moon create secret generic secret1 --from-literal user=test --from-literal pass=pwd`
-- Create an NGINX pod with `k [-n <my_namespace>] run pod1 --image=nginx:alpine [’--labels app=my_app]`
-- Create a temporary NGINX pod named tmp to check a service connection (because the Service is in a different Namespace from the test pod, it is reachable using FQDNs):
+- Create a ConfigMap from a file, with a specific key: `k create configmap my-cm --from-file=index.html=/opt/course/15/web-moon.html`
+- Create a secret (with implicit base64 encoding): `k create secret generic my-secret --from-literal user=test --from-literal pass=pwd`
+- Create an NGINX pod with `k run pod1 --image=nginx:alpine [’--labels app=my_app]`
+- Create a busybox pod with `k [-n <my_ns>] run pod6 --image=busybox $do --command -- sh -c "touch /tmp/ready && sleep 1d" > pod6.yml`
+- Create a pod with a volume backed by a config map: `k create -f https://kubernetes.io/examples/pods/pod-configmap-volume.yaml $do > pod.yml`
+- Create a temporary NGINX pod to check a service connection (because the Service is in a different Namespace from the test pod, it is reachable using FQDNs):
 ```
-k run tmp --restart=Never --rm -i --image=nginx:alpine -- curl -m 5 sun-srv.sun:9999
+k run tmp [--restart=Never] --rm -i --image=nginx:alpine -- curl -m 5 sun-srv.sun:9999
 Connecting to sun-srv.sun:9999 (10.23.253.120:9999)
 <title>Welcome to nginx!</title>
 ```
-- Create a busybox pod with `k [-n <my_namespace>] run pod6 --image=busybox:1.31.0 $do --command -- sh -c "touch /tmp/ready && sleep 1d" > 6.yaml`
-- Create a pod YAML file with a volume backed by a config map, per https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#populate-a-volume-with-data-stored-in-a-configmap, then check the output of a key from the mounted volume
-```
-k create -f https://kubernetes.io/examples/pods/pod-configmap-volume.yaml $do > pod.yml
-k exec chewie -n yoda -- cat /etc/starwars/planet
-```
-- Create a job with `k -n neptune create job neb-new-job --image=busybox:1.31.0 $do > /opt/course/3/job.yaml -- sh -c "sleep 2 && echo done"`
-  - Remember there is no such thing as starting a Job or CronJob! Check the pod execution...
-- Create an nginx deployment: `k create deployment sunny --image=nginx:stable $do > sunny_deployment.yml` (deployment name is used as prefix for pods' name)
+- Create a job with `k create job my-job --image=busybox:1.31.0 $do > /opt/course/3/job.yaml -- sh -c "sleep 2 && echo done"` then check the pod execution (no such thing as starting a Job or CronJob!)
+- Create an nginx deployment: `k create deployment my-dep --image=nginx:stable $do > my-dep.yml` (deployment name is used as prefix for pods' name)
 - Create a Service...
-  - ...to expose a given pod `k -n pluto expose pod project-plt-6cc-api --name project-plt-6cc-svc --port 3333 --target-port 80`
-    - `expose` will create everything needed...much faster than creating a service and editing it to set the correct selector labels 
-      - `k -n pluto create service clusterip project-plt-6cc-svc --tcp 3333:80 $do`
+  - ...to expose a given pod `k expose pod my-pod --name my-svc --port 3333 --target-port 80` (much faster than creating a service and editing it to set the correct selector labels) 
   - ...for an nginx deployment, which serves on port 80 and connects to the containers on port 8000: `k expose deployment nginx --port=80 --target-port=8000 [--type ClusterIp|NodePort|...] $do`
 - Note: A NodePort Service kind of lies on top of a ClusterIP one, making the ClusterIP Service reachable on the Node IPs (internal and external).
 
 ### Update resources
-- Add / remove a label: `k label pods my-pod new-label=awesome` / `k label pods my-pod new-label-`
-- Recreate the pods in a deployment: `k -n moon rollout restart deploy web-moon`
+- Add / remove a label: `k label pods my-pod app=b` / `k label pods my-pod app-`
+- Recreate the pods in a deployment: `k rollout restart deploy web-moon`
 - Perform a rolling update (e.g. to change an image): `k edit deployment fish` or `k set image deployment/fish nginx=nginx:1.21.5`
 - Check rollout status: `k rollout status deployment/rolling-deployment`
 - Roll back to the previous version: `k rollout undo deployment/rolling-deployment`
 
 ### Execute commands
 - Create a one-shot pod: `k run --image busybox --restart=Never -ti busybox --rm`
-- Execute commands on a running pod: `k -n moon exec secret-handler -- env | grep SECRET1`, `k -n moon exec secret-handler -- cat /tmp/secret2/key`
-- Execute commands on a running pod in interactive mode: `k exec <podName> -i sh`
+- Execute commands on a running pod: `k exec my-pod (-- env | grep SECRET1 || -- cat /tmp/secret2/key)`
+- Execute commands on a running pod in interactive mode: `k exec my-pod -i sh`
 
 ### Debugging
 - Use `k get pods [-A] [--show-labels]`: check `STATUS`, `READY` and `RESTARTS` attributes.
-- Use `k get pod <pod_name> -o json | jq .status.phase` to retrieve the status of a given pod
-- Use `k logs <pod_name> [-c <container_name>]` to retrieve pod / container logs.
+- Retrieve a pod status: `k get pod <pod_name> -o json | jq .status.phase`
+- Retrieve pod / container logs: `k logs <pod_name> [-c <container_name>]`
 - List events for a given namespace / all namespaces: `k get events -n <my-namespace>` / `k get events -A` 
 - Show metrics for pods / pod / nodes: `k top pods` / `k top pod --selector=XXXX=YYYY` / `k top node`
 
 ### Delete / replace resources
-- Force replace, delete and then re-create the resource: `k replace --force -f ./pod.json`
-- Delete pods and services with label name=myLabel: `k delete pods,services -l name=myLabel $now`
+- Force replace a resource: `k replace --force -f ./pod.json`
+- Delete pods and services using their label: `k delete pods,services -l app=b $now`
 
 ### Secrets for ServiceAccount
 - If a Secret belongs to a ServiceAccount, it'll have the annotation `kubernetes.io/service-account.name`
-- To get the base64 encoded token: `k -n neptune get secret neptune-secret-1 -o yaml`
-- To get the base64 decoded token, pipe it manually through `echo <token> | base64 -d -` or `k -n neptune describe secret neptune-secret-1`
+- Use `k get secret ...` to get a base64 encoded token 
+- Use `k describe secret ...` to get a base64 decoded token...or pipe it manually through `echo <token> | base64 -d -`
 
 ### NetworkPolicy
-- Example of egress policy, 1) restricting outgoing tcp connections from Deployment frontend and only allows those going to Deployment api, 2) still allowing outgoing traffic on UDP/TCP ports 53 for DNS resolution.
+- Example of egress policy, 1) restricting outgoing tcp connections from frontend to api, 2) still allowing outgoing traffic on UDP/TCP ports 53 for DNS resolution.
 ```
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy <...>
@@ -85,8 +78,8 @@ spec:
   egress:
   - to:                     # 1st egress rule
     - podSelector:            # allow egress only to pods with api label
-      matchLabels:
-      id: api
+        matchLabels:
+          id: api
   - ports:                  # 2nd egress rule
     - port: 53                # allow DNS UDP
       protocol: UDP
@@ -95,13 +88,13 @@ spec:
 ```
 
 ### Helm
-- List release with `helm [-n my_namespace] ls [-a]`
+- List release with `helm [-n my_ns] ls [-a]`
 - List / search repo: `helm repo list` / `helm search repo nginx`
 - Check customisable values setting for an install, e.g. `helm show values bitnami/apache [| yq e]`
-- Custom install example `helm -n mercury install internal-issue-report-apache bitnami/apache --set replicaCount=2`
-- Upgrade a release, e.g. `helm -n mercury upgrade internal-issue-report-apiv2 bitnami/nginx`
+- Custom install example `helm install my-apache bitnami/apache --set replicaCount=2`
+- Upgrade a release, e.g. `helm upgrade my-api-v2 bitnami/nginx`
 - Undo a helm rollout/upgrade: `helm rollback`
-- Delete an installed release with `helm [-n my_namespace] uninstall <release_name>`
+- Delete an installed release with `helm uninstall <release_name>`
 
 [//]: # (### Debugging - part 2)
 [//]: # (- Check cluster-level logs if you still cannot locate any relevant information.)
