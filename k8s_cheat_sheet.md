@@ -2,31 +2,28 @@
 
 <!-- TOC -->
 * [kubernetes cheat sheet](#kubernetes-cheat-sheet)
-  * [Linux](#linux)
   * [General](#general)
   * [Create resources](#create-resources)
   * [Update resources](#update-resources)
   * [Delete / replace resources](#delete--replace-resources)
   * [Execute commands](#execute-commands)
   * [Debugging](#debugging)
-  * [YAML templates](#yaml-templates)
   * [Secrets for ServiceAccount](#secrets-for-serviceaccount)
   * [NetworkPolicy](#networkpolicy)
   * [Helm](#helm)
-  * [References](#references)
 <!-- TOC -->
 
-## Linux
-
-- In vi / vim, to indent multiple lines:
-  - set the shiftwidth using :set shiftwidth=2
-  - mark multiple lines using **Shift v** and the up/down keys
-  - press `>` or `<`
-  - repeat / cancel the action using `.` / `u`
-- Use `grep -A2 Mounts` to show two lines after the line matching `Mounts`
+[//]: # (## Linux)
+[//]: # ()
+[//]: # (- In vi / vim, to indent multiple lines:)
+[//]: # (  - set the shiftwidth using :set shiftwidth=2)
+[//]: # (  - mark multiple lines using **Shift v** and the up/down keys)
+[//]: # (  - press `>` or `<`)
+[//]: # (  - repeat / cancel the action using `.` / `u`)
 
 ## General
 
+- Use `grep -A2 Mounts` to show two lines after the line matching `Mounts`
 - Check all resources at once: `k get all [-A]`
 - Select the acgk8s cluster to interact: `k config use-context acgk8s`
 - API e.g. for pod manifests : `k explain pods[.child1.child2] | more` OR https://kubernetes.io/docs/reference/kubernetes-api/
@@ -41,10 +38,7 @@
 ```
 k run tmp --restart=Never --rm -i --image=nginx:alpine -- curl -m 5 sun-srv.sun:9999
 Connecting to sun-srv.sun:9999 (10.23.253.120:9999)
-<!DOCTYPE html>
-<html>
-<head>
-<title>Welcome to nginx!</title>
+... <title>Welcome to nginx!</title>
 ```
 - Create a busybox pod with `k [-n <my_namespace>] run pod6 --image=busybox:1.31.0 $do --command -- sh -c "touch /tmp/ready && sleep 1d" > 6.yaml`
 - Create a pod YAML file with a volume backed by a config map, per https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#populate-a-volume-with-data-stored-in-a-configmap, then check the output of a key from the mounted volume
@@ -52,10 +46,8 @@ Connecting to sun-srv.sun:9999 (10.23.253.120:9999)
 k create -f https://kubernetes.io/examples/pods/pod-configmap-volume.yaml $do > pod.yml
 k exec chewie -n yoda -- cat /etc/starwars/planet
 ```
-
 - Create a job with `k -n neptune create job neb-new-job --image=busybox:1.31.0 $do > /opt/course/3/job.yaml -- sh -c "sleep 2 && echo done"`
-  - Namespace goes before the `create` keyword; command goes at the end 
-- Remember there is no such thing as starting a Job or CronJob! Check the pod execution...
+  - Remember there is no such thing as starting a Job or CronJob! Check the pod execution...
 - Create an nginx deployment: `k create deployment sunny --image=nginx:stable $do > sunny_deployment.yml` (deployment name is used as prefix for pods' name)
 - Create a Service...
   - ...to expose a given pod `k -n pluto expose pod project-plt-6cc-api --name project-plt-6cc-svc --port 3333 --target-port 80`
@@ -108,22 +100,14 @@ k set image deployment/fish nginx=nginx:1.21.5
   - for clusters at https://kubernetes.io/docs/tasks/debug/debug-cluster/
 
 [//]: # (## YAML templates)
-
 [//]: # ()
 [//]: # (- Search YAML templates)
-
 [//]: # (  - in documentation web pages with `kind: <resource_name>`)
-
 [//]: # (  - on disk with `grep -r <search> [directory]`)
-
 [//]: # (- Pod: [Tasks]&#40;https://kubernetes.io/docs/tasks/&#41; > [Configure Pods and Containers]&#40;https://kubernetes.io/docs/tasks/configure-pod-container/&#41;, copy file URL then `wget <file_url>`and modify... )
-
 [//]: # (- Deployment)
-
 [//]: # (- ConfiMap)
-
 [//]: # (- Secret)
-
 [//]: # (- Service)
 
 ## Secrets for ServiceAccount
@@ -181,8 +165,8 @@ bitnami/nginx         9.5.2           1.21.1          Chart for the nginx server
 - Check customisable values setting for an install, e.g. `helm show values bitnami/apache [| yq e]`
 - Custom install example `helm -n mercury install internal-issue-report-apache bitnami/apache --set replicaCount=2`
 
-## References
-- https://kubernetes.io/docs/reference/k/cheatsheet/
-- https://github.com/dennyzhang/cheatsheet-kubernetes-A4
-- https://codefresh.io/blog/kubernetes-cheat-sheet/
-- https://intellipaat.com/blog/tutorial/devops-tutorial/kubernetes-cheat-sheet/
+[//]: # (## References)
+[//]: # (- https://kubernetes.io/docs/reference/k/cheatsheet/)
+[//]: # (- https://github.com/dennyzhang/cheatsheet-kubernetes-A4)
+[//]: # (- https://codefresh.io/blog/kubernetes-cheat-sheet/)
+[//]: # (- https://intellipaat.com/blog/tutorial/devops-tutorial/kubernetes-cheat-sheet/)
