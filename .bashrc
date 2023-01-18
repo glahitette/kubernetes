@@ -106,6 +106,7 @@ alias c=clear
 
 ###################################################### Kubernetes ######################################################
 alias k=kubectl
+alias ka='f() { [ "$1" ] && kubectl apply -f $1 ; } ; f'
 source /etc/bash_completion
 source <(kubectl completion bash)
 complete -F __start_kubectl k
