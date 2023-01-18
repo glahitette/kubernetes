@@ -107,6 +107,10 @@ alias c=clear
 ###################################################### Kubernetes ######################################################
 alias k=kubectl
 alias ka='f() { [ "$1" ] && kubectl apply -f $1 ; } ; f'
+alias kd='k get deployments -o wide'
+alias kl='k logs'
+alias kp='k get pods -o wide --show-labels'
+alias kno='k get nodes -o wide'
 source /etc/bash_completion
 source <(kubectl completion bash)
 complete -F __start_kubectl k

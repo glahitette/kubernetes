@@ -1,6 +1,9 @@
 echo "alias c=clear" >> ~/.bashrc
 echo "alias h=history" >> ~/.bashrc
 echo "alias k=kubectl" >> ~/.bashrc
+echo "alias kd='k get deployments -o wide'" >> ~/.bashrc
+echo "alias kp='k get pods -o wide --show-labels'" >> ~/.bashrc
+echo "alias kno='k get nodes -o wide'" >> ~/.bashrc
 echo "alias kn='kubectl config set-context --current --namespace ' # switch namespace with kn default or kn my-namespace" >> ~/.bashrc
 echo "alias ka='f() { [ "$1" ] && kubectl apply -f $1 ; } ; f'" >> ~/.bashrc
 echo "source /etc/bash_completion" >> ~/.bashrc
