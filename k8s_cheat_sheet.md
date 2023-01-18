@@ -56,20 +56,11 @@ k exec chewie -n yoda -- cat /etc/starwars/planet
 - Execute commands on a running pod in interactive mode: `k exec <podName> -i sh`
 
 ### Debugging
-- Use `k get pods [-A] [--show-labels]` to check the `STATUS` of all Pods in a Namespace, but also their `READY` and `RESTARTS` attributes.
-- Use `k get pod <pod_name> -o json | jq .status.phase` to get the status of a given pod
-- Use `k describe <resource_name>` to get detailed information about Kubernetes objects, including events.
+- Use `k get pods [-A] [--show-labels]`: check `STATUS`, `READY` and `RESTARTS` attributes.
+- Use `k get pod <pod_name> -o json | jq .status.phase` to retrieve the status of a given pod
 - Use `k logs <pod_name> [-c <container_name>]` to retrieve pod / container logs.
 - List events for a given namespace / all namespaces: `k get events -n <my-namespace>` / `k get events -A` 
 - Show metrics for pods / pod / nodes: `k top pods` / `k top pod --selector=XXXX=YYYY` / `k top node`
-- Check cluster-level logs if you still cannot locate any relevant information.
-  - Check the kube-apiserver logs, e.g.
-    `sudo tail -100f /var/log/containers/kube-apiserver-k8s-control_kube-system_kube-apiserver-<hash>.log`
-  - Check the kubelet status / logs: `sudo systemctl status kubelet` / `sudo journalctl -fu kubelet`
-- More troubleshooting tips...
-  - for pods at https://kubernetes.io/docs/tasks/debug/debug-application/debug-running-pod/
-  - for applications at https://kubernetes.io/docs/tasks/debug/debug-application/
-  - for clusters at https://kubernetes.io/docs/tasks/debug/debug-cluster/
 
 ### Delete / replace resources
 - Force replace, delete and then re-create the resource: `k replace --force -f ./pod.json`
@@ -105,21 +96,22 @@ spec:
 
 ### Helm
 - List release with `helm [-n my_namespace] ls [-a]`
-- Delete an installed release with `helm [-n my_namespace] uninstall <release_name>`
-- List / search repo:
-```
-helm repo list
-NAME    URL                               
-bitnami https://charts.bitnami.com/bitnami
-
-helm search repo nginx
-NAME                  CHART VERSION   APP VERSION     DESCRIPTION          
-bitnami/nginx         9.5.2           1.21.1          Chart for the nginx server             ...
-```
-- Upgrade a release, e.g. `helm -n mercury upgrade internal-issue-report-apiv2 bitnami/nginx`
-- Undo a helm rollout/upgrade: `helm rollback`
+- List / search repo: `helm repo list` / `helm search repo nginx`
 - Check customisable values setting for an install, e.g. `helm show values bitnami/apache [| yq e]`
 - Custom install example `helm -n mercury install internal-issue-report-apache bitnami/apache --set replicaCount=2`
+- Upgrade a release, e.g. `helm -n mercury upgrade internal-issue-report-apiv2 bitnami/nginx`
+- Undo a helm rollout/upgrade: `helm rollback`
+- Delete an installed release with `helm [-n my_namespace] uninstall <release_name>`
+
+[//]: # (### Debugging - part 2)
+[//]: # (- Check cluster-level logs if you still cannot locate any relevant information.)
+[//]: # (  - Check the kube-apiserver logs, e.g.)
+[//]: # (    `sudo tail -100f /var/log/containers/kube-apiserver-k8s-control_kube-system_kube-apiserver-<hash>.log`)
+[//]: # (  - Check the kubelet status / logs: `sudo systemctl status kubelet` / `sudo journalctl -fu kubelet`)
+[//]: # (- More troubleshooting tips...)
+[//]: # (  - for pods at https://kubernetes.io/docs/tasks/debug/debug-application/debug-running-pod/)
+[//]: # (  - for applications at https://kubernetes.io/docs/tasks/debug/debug-application/)
+[//]: # (  - for clusters at https://kubernetes.io/docs/tasks/debug/debug-cluster/)
 
 [//]: # (### Linux)
 [//]: # ()
