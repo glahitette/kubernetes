@@ -98,7 +98,10 @@ spec:
 
 ### Helm
 - List release with `helm [-n my_ns] ls [-a]`
+- List pending deployments on all namespaces: `helm list --pending -A`
 - List / search repo: `helm repo list` / `helm search repo nginx`
+- Download (not install) a chart from a repository: `helm pull [chart URL | repo/chartname] [...] [flags]`
+- Untar a chart (after downloading it): `helm pull --untar [rep/chartname]`
 - Check customisable values setting for an install, e.g. `helm show values bitnami/apache [| yq e]`
 - Custom install example `helm install my-apache bitnami/apache --set replicaCount=2`
 - Upgrade a release, e.g. `helm upgrade my-api-v2 bitnami/nginx`
