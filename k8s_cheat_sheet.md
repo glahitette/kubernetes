@@ -10,7 +10,7 @@
 * [Helm](#helm)
 <!-- TOC -->
 
-[//]: # (## Linux)
+[//]: # (# Linux)
 [//]: # ()
 [//]: # (- In vi / vim, to indent multiple lines:)
 [//]: # (  - set the shiftwidth using :set shiftwidth=2)
