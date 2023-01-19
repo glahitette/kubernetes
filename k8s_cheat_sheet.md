@@ -1,8 +1,9 @@
 <!-- TOC -->
     * [General](#general)
-    * [Create resources](#create-resources)
+    * [Create pods](#create-pods)
+    * [Test a pod](#test-a-pod)
+    * [Create other resources](#create-other-resources)
     * [Update resources](#update-resources)
-    * [Execute commands](#execute-commands)
     * [Debugging](#debugging)
     * [Delete / replace resources](#delete--replace-resources)
     * [Secrets for ServiceAccount](#secrets-for-serviceaccount)
@@ -107,16 +108,6 @@ spec:
 - Upgrade a release, e.g. `helm upgrade my-api-v2 bitnami/nginx`
 - Undo a helm rollout/upgrade: `helm rollback`
 - Delete an installed release with `helm uninstall <release_name>`
-
-
-
-
-
-
-
-
-
-
 
 
 
