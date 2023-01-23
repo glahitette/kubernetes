@@ -109,11 +109,55 @@ spec:
 - Undo a helm rollout/upgrade: `helm rollback`
 - Delete an installed release with `helm uninstall <release_name>`
 
-### Administer cluster
-- Drain a node: `k drain [--ignore-daemonsets --force] <node name>`
-  - The kubectl drain subcommand on its own does not actually drain a node of its DaemonSet pods: the DaemonSet controller (part of the control plane) immediately replaces missing Pods with new equivalent Pods.
-  - The DaemonSet controller also creates Pods that ignore unschedulable taints, which allows the new Pods to launch onto a node that you are draining.
-- Resume scheduling **new pods** onto the node: `k uncordon <node name>`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[//]: # (### Debugging - part 2)
+[//]: # (- Check cluster-level logs if you still cannot locate any relevant information.)
+[//]: # (  - Check the kube-apiserver logs, e.g.)
+[//]: # (    `sudo tail -100f /var/log/containers/kube-apiserver-k8s-control_kube-system_kube-apiserver-<hash>.log`)
+[//]: # (  - Check the kubelet status / logs: `sudo systemctl status kubelet` / `sudo journalctl -fu kubelet`)
+[//]: # (- More troubleshooting tips...)
+[//]: # (  - for pods at https://kubernetes.io/docs/tasks/debug/debug-application/debug-running-pod/)
+[//]: # (  - for applications at https://kubernetes.io/docs/tasks/debug/debug-application/)
+[//]: # (  - for clusters at https://kubernetes.io/docs/tasks/debug/debug-cluster/)
+
+[//]: # (### Linux)
+[//]: # ()
+[//]: # (- In vi / vim, to indent multiple lines:)
+[//]: # (  - set the shiftwidth using :set shiftwidth=2)
+[//]: # (  - mark multiple lines using **Shift v** and the up/down keys)
+[//]: # (  - press `>` or `<`)
+[//]: # (  - repeat / cancel the action using `.` / `u`)
+
+[//]: # (### YAML templates)
+[//]: # ()
+[//]: # (- Search YAML templates)
+[//]: # (  - in documentation web pages with `kind: <resource_name>`)
+[//]: # (  - on disk with `grep -r <search> [directory]`)
+[//]: # (- Pod: [Tasks]&#40;https://kubernetes.io/docs/tasks/&#41; > [Configure Pods and Containers]&#40;https://kubernetes.io/docs/tasks/configure-pod-container/&#41;, copy file URL then `wget <file_url>`and modify... )
+[//]: # (- Deployment)
+[//]: # (- ConfiMap)
+[//]: # (- Secret)
+[//]: # (- Service)
 
 [//]: # (### References)
 [//]: # (- https://kubernetes.io/docs/reference/k/cheatsheet/)
