@@ -103,6 +103,8 @@ spec:
     - port: 53                # allow DNS TCP
       protocol: TCP
 ```
+- `from` and `to` selectors:
+![](np_from_to_selectors.png)
 
 ### Helm
 - List release with `helm [-n my_ns] ls [-a]`
@@ -129,7 +131,7 @@ spec:
 - Pod’s restart policy: Always (by default), OnFailure (restarted only if error code returned), and Never.
 - Pod with InitContainer(s) will show "Init(0/n)" in their STATUS during initialisation
 - A Mirror Pod represents a Static Pod in the Kubernetes API, allowing you to easily view the Static Pod's status.
-- Kubernetes **nodes** will remain `NotReady`, unable to run Pods, until a network plugin is installed.
+- Kubernetes **nodes** will remain `NotReady`, unable to run Pods, until a network plugin is installed. `Starting kube-proxy` will be shown in the nodes logs and no networking pods will exist.
 
 [//]: # (### References)
 [//]: # (- https://kubernetes.io/docs/reference/k/cheatsheet/)
