@@ -56,11 +56,12 @@ Connecting to sun-srv.sun:9999 (10.23.253.120:9999)
 ### Update resources
 - Add / remove / change a label: `k label pods my-pod app=b` / `k label pods my-pod app-` / `k label pods my-pod app=v2 --overwrite`
 - Add a new label tier=web to all pods having 'app=v2' or 'app=v1' labels: `k label po -l "app in(v1,v2)" tier=web`
-- Change a pod's image (to nginx:1.7.1): `k set image my-pod nginx=nginx:1.7.1`
+- Change a pod's image (to nginx:1.7.1): `k set image my-pod nginx=nginx:1.7.1 [--record]`
 - Recreate the pods in a deployment: `k rollout restart deploy web-moon`
-- Perform a rolling update (e.g. to change an image): `k edit deployment fish` or `k set image deployment/fish nginx=nginx:1.21.5`
+- Perform a rolling update (e.g. to change an image): `k edit deployment fish` or `k set image deployment/fish nginx=nginx:1.21.5 [--record]`
 - Check rollout status: `k rollout status deployment/rolling-deployment`
 - Roll back to the previous version: `k rollout undo deployment/rolling-deployment`
+- Scale a deployment: `k scale deployment.v1.apps/my-dep --replicas=5 [--record]`
 - Autoscale a deployment, pods between 5 and 10, targetting CPU utilization at 80%: `k autoscale deploy nginx --min=5 --max=10 --cpu-percent=80`
   - View the Horizontal Pod Autoscalers (hpa): `k get hpa nginx` 
 
@@ -127,7 +128,8 @@ spec:
   - Example: for a service backed by multiple container endpoints, user traffic will not be sent to a particular pod until its containers have all passed the readiness checks defined by their readiness probes.
 - Pod’s restart policy: Always (by default), OnFailure (restarted only if error code returned), and Never.
 - Pod with InitContainer(s) will show "Init(0/n)" in their STATUS during initialisation
-
+- A Mirror Pod represents a Static Pod in the Kubernetes API, allowing you to easily view the Static Pod's status.
+- Kubernetes **nodes** will remain `NotReady`, unable to run Pods, until a network plugin is installed.
 
 [//]: # (### References)
 [//]: # (- https://kubernetes.io/docs/reference/k/cheatsheet/)
