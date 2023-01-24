@@ -1,0 +1,18 @@
+# deployment/redis.yaml
+---
+apiVersion: databases.spotahome.com/v1
+kind: RedisFailover
+metadata:
+  name: redisfailover
+spec:
+  redis:
+    storage:
+      persistentVolumeClaim:
+        metadata:
+          name: redisfailover-persistant-data
+        spec:
+          accessModes:
+          - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1Gi

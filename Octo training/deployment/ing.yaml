@@ -1,0 +1,17 @@
+# deployment/ing.yaml
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: kubernetes-app
+  labels:
+    app: kubernetes-app
+spec:
+  rules:
+  - host: kubernetes-app-gula.52.47.206.36.ip.aws.octo.training
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: kubernetes-app
+          servicePort: 8000

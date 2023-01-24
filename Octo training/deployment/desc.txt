@@ -1,0 +1,256 @@
+Name:           kubernetes-app-5fcf5668fb
+Namespace:      gula
+Selector:       app=kubernetes-app,pod-template-hash=5fcf5668fb
+Labels:         app=kubernetes-app
+                pod-template-hash=5fcf5668fb
+Annotations:    deployment.kubernetes.io/desired-replicas: 1
+                deployment.kubernetes.io/max-replicas: 2
+                deployment.kubernetes.io/revision: 4
+Controlled By:  Deployment/kubernetes-app
+Replicas:       0 current / 0 desired
+Pods Status:    0 Running / 0 Waiting / 0 Succeeded / 0 Failed
+Pod Template:
+  Labels:  app=kubernetes-app
+           pod-template-hash=5fcf5668fb
+  Containers:
+   kubernetes-app:
+    Image:        261407191094.dkr.ecr.eu-west-3.amazonaws.com/gula/app:v0.2
+    Port:         8000/TCP
+    Host Port:    0/TCP
+    Liveness:     http-get http://:8000/healthz delay=3s timeout=1s period=5s #success=1 #failure=3
+    Readiness:    http-get http://:8000/healthz delay=3s timeout=1s period=5s #success=1 #failure=3
+    Environment:  <none>
+    Mounts:
+      /etc/config from config-volume (rw)
+  Volumes:
+   config-volume:
+    Type:      ConfigMap (a volume populated by a ConfigMap)
+    Name:      myapp-config
+    Optional:  false
+Events:        <none>
+
+
+Name:           kubernetes-app-68f648dcdd
+Namespace:      gula
+Selector:       app=kubernetes-app,pod-template-hash=68f648dcdd
+Labels:         app=kubernetes-app
+                pod-template-hash=68f648dcdd
+Annotations:    deployment.kubernetes.io/desired-replicas: 5
+                deployment.kubernetes.io/max-replicas: 7
+                deployment.kubernetes.io/revision: 6
+Controlled By:  Deployment/kubernetes-app
+Replicas:       5 current / 5 desired
+Pods Status:    5 Running / 0 Waiting / 0 Succeeded / 0 Failed
+Pod Template:
+  Labels:  app=kubernetes-app
+           pod-template-hash=68f648dcdd
+  Containers:
+   kubernetes-app:
+    Image:      261407191094.dkr.ecr.eu-west-3.amazonaws.com/gula/app:v0.4
+    Port:       8000/TCP
+    Host Port:  0/TCP
+    Liveness:   http-get http://:8000/healthz delay=3s timeout=1s period=5s #success=1 #failure=3
+    Readiness:  http-get http://:8000/healthz delay=3s timeout=1s period=5s #success=1 #failure=3
+    Environment:
+      GUNICORN_CORES:  node allocatable (limits.cpu)
+    Mounts:
+      /etc/config from config-volume (rw)
+  Volumes:
+   config-volume:
+    Type:      ConfigMap (a volume populated by a ConfigMap)
+    Name:      myapp-config
+    Optional:  false
+Events:
+  Type    Reason            Age    From                   Message
+  ----    ------            ----   ----                   -------
+  Normal  SuccessfulCreate  16m    replicaset-controller  Created pod: kubernetes-app-68f648dcdd-42wcv
+  Normal  SuccessfulCreate  11m    replicaset-controller  Created pod: kubernetes-app-68f648dcdd-n4j59
+  Normal  SuccessfulCreate  8m40s  replicaset-controller  Created pod: kubernetes-app-68f648dcdd-b9slm
+  Normal  SuccessfulCreate  8m40s  replicaset-controller  Created pod: kubernetes-app-68f648dcdd-gsb5x
+  Normal  SuccessfulCreate  8m25s  replicaset-controller  Created pod: kubernetes-app-68f648dcdd-hh99b
+
+
+Name:           kubernetes-app-6fbfb498bd
+Namespace:      gula
+Selector:       app=kubernetes-app,pod-template-hash=6fbfb498bd
+Labels:         app=kubernetes-app
+                pod-template-hash=6fbfb498bd
+Annotations:    deployment.kubernetes.io/desired-replicas: 1
+                deployment.kubernetes.io/max-replicas: 2
+                deployment.kubernetes.io/revision: 3
+Controlled By:  Deployment/kubernetes-app
+Replicas:       0 current / 0 desired
+Pods Status:    0 Running / 0 Waiting / 0 Succeeded / 0 Failed
+Pod Template:
+  Labels:  app=kubernetes-app
+           pod-template-hash=6fbfb498bd
+  Containers:
+   kubernetes-app:
+    Image:        261407191094.dkr.ecr.eu-west-3.amazonaws.com/gula/app:v0.2
+    Port:         8000/TCP
+    Host Port:    0/TCP
+    Environment:  <none>
+    Mounts:
+      /etc/config from config-volume (rw)
+  Volumes:
+   config-volume:
+    Type:      ConfigMap (a volume populated by a ConfigMap)
+    Name:      myapp-config
+    Optional:  false
+Events:        <none>
+
+
+Name:           kubernetes-app-747674d757
+Namespace:      gula
+Selector:       app=kubernetes-app,pod-template-hash=747674d757
+Labels:         app=kubernetes-app
+                pod-template-hash=747674d757
+Annotations:    deployment.kubernetes.io/desired-replicas: 1
+                deployment.kubernetes.io/max-replicas: 2
+                deployment.kubernetes.io/revision: 5
+Controlled By:  Deployment/kubernetes-app
+Replicas:       0 current / 0 desired
+Pods Status:    0 Running / 0 Waiting / 0 Succeeded / 0 Failed
+Pod Template:
+  Labels:  app=kubernetes-app
+           pod-template-hash=747674d757
+  Containers:
+   kubernetes-app:
+    Image:        261407191094.dkr.ecr.eu-west-3.amazonaws.com/gula/app:v0.3
+    Port:         8000/TCP
+    Host Port:    0/TCP
+    Liveness:     http-get http://:8000/healthz delay=3s timeout=1s period=5s #success=1 #failure=3
+    Readiness:    http-get http://:8000/healthz delay=3s timeout=1s period=5s #success=1 #failure=3
+    Environment:  <none>
+    Mounts:
+      /etc/config from config-volume (rw)
+  Volumes:
+   config-volume:
+    Type:      ConfigMap (a volume populated by a ConfigMap)
+    Name:      myapp-config
+    Optional:  false
+Events:
+  Type    Reason            Age   From                   Message
+  ----    ------            ----  ----                   -------
+  Normal  SuccessfulDelete  16m   replicaset-controller  Deleted pod: kubernetes-app-747674d757-q4zpr
+
+
+Name:           kubernetes-app-7897c76f9d
+Namespace:      gula
+Selector:       app=kubernetes-app,pod-template-hash=7897c76f9d
+Labels:         app=kubernetes-app
+                pod-template-hash=7897c76f9d
+Annotations:    deployment.kubernetes.io/desired-replicas: 1
+                deployment.kubernetes.io/max-replicas: 2
+                deployment.kubernetes.io/revision: 1
+Controlled By:  Deployment/kubernetes-app
+Replicas:       0 current / 0 desired
+Pods Status:    0 Running / 0 Waiting / 0 Succeeded / 0 Failed
+Pod Template:
+  Labels:  app=kubernetes-app
+           pod-template-hash=7897c76f9d
+  Containers:
+   kubernetes-app:
+    Image:        261407191094.dkr.ecr.eu-west-3.amazonaws.com/gula/app:v0.1
+    Port:         8000/TCP
+    Host Port:    0/TCP
+    Environment:  <none>
+    Mounts:       <none>
+  Volumes:        <none>
+Events:           <none>
+
+
+Name:           kubernetes-app-7c68997567
+Namespace:      gula
+Selector:       app=kubernetes-app,pod-template-hash=7c68997567
+Labels:         app=kubernetes-app
+                pod-template-hash=7c68997567
+Annotations:    deployment.kubernetes.io/desired-replicas: 1
+                deployment.kubernetes.io/max-replicas: 2
+                deployment.kubernetes.io/revision: 2
+Controlled By:  Deployment/kubernetes-app
+Replicas:       0 current / 0 desired
+Pods Status:    0 Running / 0 Waiting / 0 Succeeded / 0 Failed
+Pod Template:
+  Labels:  app=kubernetes-app
+           pod-template-hash=7c68997567
+  Containers:
+   kubernetes-app:
+    Image:        261407191094.dkr.ecr.eu-west-3.amazonaws.com/gula/app:v0.1
+    Port:         8000/TCP
+    Host Port:    0/TCP
+    Environment:  <none>
+    Mounts:       <none>
+  Volumes:        <none>
+Events:           <none>
+
+
+Name:                   kubernetes-app
+Namespace:              gula
+CreationTimestamp:      Tue, 22 Nov 2022 11:27:39 +0000
+Labels:                 app=kubernetes-app
+Annotations:            deployment.kubernetes.io/revision: 6
+                        kubectl.kubernetes.io/last-applied-configuration:
+                          {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app":"kubernetes-app"},"name":"kubernetes-app","namesp...
+Selector:               app=kubernetes-app
+Replicas:               5 desired | 5 updated | 5 total | 5 available | 0 unavailable
+StrategyType:           RollingUpdate
+MinReadySeconds:        0
+RollingUpdateStrategy:  25% max unavailable, 25% max surge
+Pod Template:
+  Labels:  app=kubernetes-app
+  Containers:
+   kubernetes-app:
+    Image:      261407191094.dkr.ecr.eu-west-3.amazonaws.com/gula/app:v0.4
+    Port:       8000/TCP
+    Host Port:  0/TCP
+    Liveness:   http-get http://:8000/healthz delay=3s timeout=1s period=5s #success=1 #failure=3
+    Readiness:  http-get http://:8000/healthz delay=3s timeout=1s period=5s #success=1 #failure=3
+    Environment:
+      GUNICORN_CORES:  node allocatable (limits.cpu)
+    Mounts:
+      /etc/config from config-volume (rw)
+  Volumes:
+   config-volume:
+    Type:      ConfigMap (a volume populated by a ConfigMap)
+    Name:      myapp-config
+    Optional:  false
+Conditions:
+  Type           Status  Reason
+  ----           ------  ------
+  Progressing    True    NewReplicaSetAvailable
+  Available      True    MinimumReplicasAvailable
+OldReplicaSets:  <none>
+NewReplicaSet:   kubernetes-app-68f648dcdd (5/5 replicas created)
+Events:
+  Type    Reason             Age    From                   Message
+  ----    ------             ----   ----                   -------
+  Normal  ScalingReplicaSet  16m    deployment-controller  Scaled up replica set kubernetes-app-68f648dcdd to 1
+  Normal  ScalingReplicaSet  16m    deployment-controller  Scaled down replica set kubernetes-app-747674d757 to 0
+  Normal  ScalingReplicaSet  11m    deployment-controller  Scaled up replica set kubernetes-app-68f648dcdd to 2
+  Normal  ScalingReplicaSet  8m40s  deployment-controller  Scaled up replica set kubernetes-app-68f648dcdd to 4
+  Normal  ScalingReplicaSet  8m25s  deployment-controller  Scaled up replica set kubernetes-app-68f648dcdd to 5
+
+
+Name:                                                  kubernetes-app
+Namespace:                                             gula
+Labels:                                                <none>
+Annotations:                                           <none>
+CreationTimestamp:                                     Wed, 23 Nov 2022 08:26:11 +0000
+Reference:                                             Deployment/kubernetes-app
+Metrics:                                               ( current / target )
+  resource cpu on pods  (as a percentage of request):  14% (1m) / 80%
+Min replicas:                                          2
+Max replicas:                                          5
+Deployment pods:                                       5 current / 5 desired
+Conditions:
+  Type            Status  Reason               Message
+  ----            ------  ------               -------
+  AbleToScale     True    ScaleDownStabilized  recent recommendations were higher than current one, applying the highest recent recommendation
+  ScalingActive   True    ValidMetricFound     the HPA was able to successfully calculate a replica count from cpu resource utilization (percentage of request)
+  ScalingLimited  True    TooManyReplicas      the desired replica count is more than the maximum replica count
+Events:
+  Type    Reason             Age    From                       Message
+  ----    ------             ----   ----                       -------
+  Normal  SuccessfulRescale  8m40s  horizontal-pod-autoscaler  New size: 4; reason: cpu resource utilization (percentage of request) above target
+  Normal  SuccessfulRescale  8m25s  horizontal-pod-autoscaler  New size: 5; reason: cpu resource utilization (percentage of request) above target

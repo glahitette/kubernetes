@@ -1,0 +1,18 @@
+# deployment/servicemonitor.yaml
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    k8s-app: prometheus
+  name: kubernetes-application
+spec:
+  endpoints:
+  - interval: 10s
+    port: metrics
+  namespaceSelector:
+    matchNames:
+    - gula
+  selector:
+    matchLabels:
+      app: kubernetes-app

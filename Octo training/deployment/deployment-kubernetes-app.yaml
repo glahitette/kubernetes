@@ -1,0 +1,60 @@
+# deployment/deployment-kubernetes-app.yaml
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kubernetes-app
+  labels:
+    app: kubernetes-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: kubernetes-app
+  template:
+    metadata:
+      labels:
+        app: kubernetes-app
+    spec:
+      volumes:                              # <== Ajout
+      - name: config-volume                 # <== Ajout
+        configMap:                          # <== Ajout
+          name: myapp-config                # <== Ajout
+      containers:
+      - name: kubernetes-app
+        resources:
+          limits:
+            cpu: 70m
+            # memory: 1Gi
+          requests:
+            cpu: 70m
+            # memory: 500m
+        image: 261407191094.dkr.ecr.eu-west-3.amazonaws.com/gula/app:v0.7.1  # <== Modif version
+        env:                                 # <== Ajout
+        - name: GUNICORN_CORES               # <== Ajout
+          valueFrom:                         # <== Ajout
+            resourceFieldRef:                # <== Ajout
+              containerName: kubernetes-app  # <== Ajout
+              resource: limits.cpu           # <== Ajout
+        - name: REDIS_SENTINEL_SERVICE
+          value: rfs-redisfailover
+        ports:
+        - containerPort: 8000
+          name: http
+        livenessProbe:            # <== Ajout
+          httpGet:                # <== Ajout
+            path: /healthz        # <== Ajout
+            port: 8000            # <== Ajout
+          initialDelaySeconds: 3  # <== Ajout
+          periodSeconds: 5        # <== Ajout
+        readinessProbe:           # <== Ajout
+          httpGet:                # <== Ajout
+            path: /ready
+            port: 8000            # <== Ajout
+          initialDelaySeconds: 3  # <== Ajout
+          periodSeconds: 5        # <== Ajout
+        volumeMounts:                       # <== Ajout
+        - name: config-volume               # <== Ajout
+          mountPath: /etc/config            # <== Ajout
+      imagePullSecrets: # <== Ajout
+      - name: regsec    # <== Ajout

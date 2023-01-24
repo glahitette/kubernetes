@@ -1,0 +1,23 @@
+# kubernetes-app/docker-compose.yml
+---
+version: '3'
+services:
+  app:
+    build: .
+    image: "$REGISTRY_URL/$TRG/app:v0.7"
+    ports:
+    - "8000:8000"
+    volumes:                                      # <== Ajout
+    - "./log-config.ini:/etc/config/log-config.ini"  # <== Ajout
+    - "../deployment/message:/etc/config/message"  # <== Ajout
+    environment:                                     # <== Ajout
+    - REDIS_SENTINEL_SERVICE=sentinel                # <== Ajout
+  master:                                            # <== Ajout
+    image: redis                                     # <== Ajout
+  sentinel:                                          # <== Ajout
+    image: redis                                     # <== Ajout
+    volumes:                                         # <== Ajout
+    - ./sentinel.conf:/etc/sentinel.conf             # <== Ajout
+    command: redis-sentinel /etc/sentinel.conf       # <== Ajout
+    ports:                                           # <== Ajout
+    - "26379:26379"                                  # <== Ajout
