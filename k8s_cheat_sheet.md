@@ -18,6 +18,7 @@
 - List of resources: `k api-resources`
 - Check all resources at once: `k get all [-A]`
 - List k8s "internal" pods, sorted by node name: `k get pods -n kube-system --sort-by .spec.nodeName`
+- Scale a deployment and record the command (into Annotations > change-cause): `k scale deployment my-deployment replicas=5 --record`
 - Select the acgk8s cluster to interact: `k config use-context acgk8s`
 - API e.g. for pod manifests : `k explain pods[.child1.child2] | more` OR https://kubernetes.io/docs/reference/kubernetes-api/
 
@@ -48,6 +49,8 @@ Connecting to sun-srv.sun:9999 (10.23.253.120:9999)
   - ...for an nginx deployment, which serves on port 80 and connects to the containers on port 8000: `k expose deployment nginx --port=80 --target-port=8000 [--type ClusterIp|NodePort|...] [$do]`
 - Note: A NodePort Service kind of lies on top of a ClusterIP one, making the ClusterIP Service reachable on the Node IPs (internal and external).
 - Create a quota: `k create quota my-quota --hard=cpu=1,memory=1G,pods=2,services=3,replicationcontrollers=2,resourcequotas=1,secrets=5,persistentvolumeclaims=10 [$do]`
+- Create Role / ClusterRole to permissions within a namespace / cluster-wide: `k create role my-role --verb=get,list,watch --resource=pods,pods/logs`
+- Create RoleBinding / ClusterRoleBinding to connect Roles / ClusterRoles to users: `k create rolebinding my-rb --role=my-role --user=my-user`
 
 ### Update resources
 - Add / remove / change a label: `k label pods my-pod app=b` / `k label pods my-pod app-` / `k label pods my-pod app=v2 --overwrite`
