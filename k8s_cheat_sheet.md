@@ -50,7 +50,8 @@ Connecting to sun-srv.sun:9999 (10.23.253.120:9999)
 - Note: A NodePort Service kind of lies on top of a ClusterIP one, making the ClusterIP Service reachable on the Node IPs (internal and external).
 - Create a quota: `k create quota my-quota --hard=cpu=1,memory=1G,pods=2,services=3,replicationcontrollers=2,resourcequotas=1,secrets=5,persistentvolumeclaims=10 [$do]`
 - Create Role / ClusterRole to permissions within a namespace / cluster-wide: `k create role my-role --verb=get,list,watch --resource=pods,pods/logs`
-- Create RoleBinding / ClusterRoleBinding to connect Roles / ClusterRoles to users: `k create rolebinding my-rb --role=my-role --user=my-user`
+- Create RoleBinding / ClusterRoleBinding to connect Roles / ClusterRoles to subjects (users, groups or ServiceAccounts): `k create rolebinding my-rb --role=my-role --user=my-user`
+- Create a service account to allow container processes within Pods to authenticate with the K8s API: `k create sa my-sa`
 
 ### Update resources
 - Add / remove / change a label: `k label pods my-pod app=b` / `k label pods my-pod app-` / `k label pods my-pod app=v2 --overwrite`
@@ -68,7 +69,7 @@ Connecting to sun-srv.sun:9999 (10.23.253.120:9999)
 - Retrieve a pod status: `k get pod <pod_name> -o json | jq .status.phase`
 - Retrieve pod / container logs: `k logs <pod_name> [-c <container_name>] [-p]` (if pod crashed and restarted, -p option gets logs about the previous instance)
 - List events for a given namespace / all namespaces: `k get events -n <my-namespace>` / `k get events -A` 
-- Show metrics for pods / pod / nodes: `k top pods` / `k top pod --selector=XXXX=YYYY` / `k top node`
+- Show metrics for pods / pod / nodes: `k top pods [--containers] [--sort-by (cpu | memory)]` / `k top pod --selector=XXXX=YYYY` / `k top node [--sort-by (cpu | memory)]`
 
 ### Delete / replace resources
 - Force replace a resource: `k replace --force -f ./pod.json`
