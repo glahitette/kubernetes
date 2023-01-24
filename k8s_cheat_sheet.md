@@ -15,7 +15,7 @@
 - Use `grep -A2 Mounts` to show two lines after the line matching `Mounts`
 - Watch pods / deployments / jobs: `k get pods -w` / `k get deployments -w` / `k get jobs -w`
 - Repeat command every n seconds, example: `watch -n 2 kubectl get pods`
-- Lis of resources: `k api-resources`
+- List of resources: `k api-resources`
 - Check all resources at once: `k get all [-A]`
 - List k8s "internal" pods, sorted by node name: `k get pods -n kube-system --sort-by .spec.nodeName`
 - Select the acgk8s cluster to interact: `k config use-context acgk8s`
