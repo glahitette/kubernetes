@@ -49,6 +49,12 @@ Connecting to sun-srv.sun:9999 (10.23.253.120:9999)
 - Pod’s restart policy: Always (by default), OnFailure (restarted only if error code returned), and Never.
 - Pod with InitContainer(s) will show "Init(0/n)" in their STATUS during initialisation
 - A Mirror Pod represents a Static Pod in the Kubernetes API, allowing you to easily view the Static Pod's status.
+- Volumes:
+  - A PersistentVolume’s `persistentVolumeReclaimPolicy` determines how the storage resources can be reused when the PersistentVolume’s associated PersistentVolumeClaims are deleted:
+    - `Retain`: Keeps all data. This requires an administrator to manually clean up the data and prepare the storage resource for reuse.
+    - `Delete`: Deletes the underlying storage resource automatically (only works for cloud storage resources).
+    - `Recycle`: Automatically deletes all data in the underlying storage resource, allowing the PersistentVolume to be reused.
+  -  `allowVolumeExpansion` property of a **StorageClass**, if set to false (per default), prevents from resizing a PersistentVolumeClaim.
 
 ### Create other resources
 - Create a job with `k create job my-job --image=busybox:1.31.0 $do > /opt/course/3/job.yaml -- sh -c "sleep 2 && echo done"` then check the pod execution (no such thing as starting a Job or CronJob!)
