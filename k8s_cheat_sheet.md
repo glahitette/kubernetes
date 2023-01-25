@@ -2,16 +2,15 @@
     * [General](#general)
     * [Create pods](#create-pods)
     * [Test a pod](#test-a-pod)
+    * [Pods, containers and storage](#pods-containers-and-storage)
     * [Create other resources](#create-other-resources)
     * [Update resources](#update-resources)
     * [Debugging](#debugging)
     * [Delete / replace resources](#delete--replace-resources)
     * [Secrets for ServiceAccount](#secrets-for-serviceaccount)
-    * [NetworkPolicy](#networkpolicy)
-    * [Helm](#helm)
+    * [Networking, network policy, services, DNS](#networking-network-policy-services-dns)
     * [Cluster administration](#cluster-administration)
-    * [Pods and containers](#pods-and-containers)
-    * [Networking, services, DNS](#networking-services-dns)
+    * [Helm](#helm)
 <!-- TOC -->
 
 ### General
@@ -42,7 +41,7 @@ Connecting to sun-srv.sun:9999 (10.23.253.120:9999)
 - With a command: `k exec my-pod [-c my-container] (-- env | grep SECRET1 || -- cat /tmp/secret2/key)`
 - In interactive mode: `k exec my-pod [-c my-container] -ti -- sh`
 
-### Pods and containers
+### Pods, containers and storage
 - Startup probes: run at container startup and stop running once they succeed; very similar to liveness probes (which run constantly on a schedule); useful for legacy applications that can have long startup times.
 - Readiness probes: used to prevent user traffic from being sent to pods that are still in the process of starting up (e.g. pod STATUS = Running but READY = "0/1")
   - Example: for a service backed by multiple container endpoints, user traffic will not be sent to a particular pod until its containers have all passed the readiness checks defined by their readiness probes.
