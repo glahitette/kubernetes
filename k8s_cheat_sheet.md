@@ -9,6 +9,9 @@
     * [Secrets for ServiceAccount](#secrets-for-serviceaccount)
     * [NetworkPolicy](#networkpolicy)
     * [Helm](#helm)
+    * [Cluster administration](#cluster-administration)
+    * [Pods and containers](#pods-and-containers)
+    * [Networking, services, DNS](#networking-services-dns)
 <!-- TOC -->
 
 ### General
