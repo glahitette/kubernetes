@@ -42,6 +42,14 @@ Connecting to sun-srv.sun:9999 (10.23.253.120:9999)
 - With a command: `k exec my-pod [-c my-container] (-- env | grep SECRET1 || -- cat /tmp/secret2/key)`
 - In interactive mode: `k exec my-pod [-c my-container] -ti -- sh`
 
+### Pods and containers
+- Startup probes: run at container startup and stop running once they succeed; very similar to liveness probes (which run constantly on a schedule); useful for legacy applications that can have long startup times.
+- Readiness probes: used to prevent user traffic from being sent to pods that are still in the process of starting up (e.g. pod STATUS = Running but READY = "0/1")
+  - Example: for a service backed by multiple container endpoints, user traffic will not be sent to a particular pod until its containers have all passed the readiness checks defined by their readiness probes.
+- Pod’s restart policy: Always (by default), OnFailure (restarted only if error code returned), and Never.
+- Pod with InitContainer(s) will show "Init(0/n)" in their STATUS during initialisation
+- A Mirror Pod represents a Static Pod in the Kubernetes API, allowing you to easily view the Static Pod's status.
+
 ### Create other resources
 - Create a job with `k create job my-job --image=busybox:1.31.0 $do > /opt/course/3/job.yaml -- sh -c "sleep 2 && echo done"` then check the pod execution (no such thing as starting a Job or CronJob!)
 - Create a ConfigMap from a file, with a specific key: `k create configmap my-cm --from-file=index.html=/opt/course/15/web-moon.html`
@@ -84,7 +92,12 @@ Connecting to sun-srv.sun:9999 (10.23.253.120:9999)
 - Use `k get secret ...` to get a base64 encoded token 
 - Use `k describe secret ...` to get a base64 decoded token...or pipe it manually through `echo <token> | base64 -d -`
 
-### NetworkPolicy
+### Networking, network policy, services, DNS
+- The cluster has a single virtual network spanning across all Nodes.
+- Kubernetes **nodes** will remain `NotReady`, unable to run Pods, until a network plugin is installed. `Starting kube-proxy` will be shown in the nodes logs and no networking pods will exist.
+- Default FQDN:
+  - `<pod-ip-addess-with-dashes>.my-namespace.pod.cluster.local.`
+  - `my-service-name.my-namespace.svc.cluster.local.`
 - Example of egress policy, 1) restricting outgoing tcp connections from frontend to api, 2) still allowing outgoing traffic on UDP/TCP ports 53 for DNS resolution.
 ```
 apiVersion: networking.k8s.io/v1
@@ -108,6 +121,14 @@ spec:
 ```
 - `from` and `to` selectors:
 ![](np_from_to_selectors.png)
+- Endpoints are the underlying entities (such as Pods) that a Service routes traffic to.
+- Ingress: manages external access to Services; more powerful than a simple NodePort Service (e.g. SSL termination, advanced load balancing, or namebased virtual hosting).
+
+### Cluster administration
+- Drain a node: `k drain [--ignore-daemonsets --force] <node name>`
+  - The kubectl drain subcommand on its own does not actually drain a node of its DaemonSet pods: the DaemonSet controller (part of the control plane) immediately replaces missing Pods with new equivalent Pods.
+  - The DaemonSet controller also creates Pods that ignore unschedulable taints, which allows the new Pods to launch onto a node that you are draining.
+- Resume scheduling **new pods** onto the node: `k uncordon <node name>`
 
 ### Helm
 - List release with `helm [-n my_ns] ls [-a]`
@@ -120,28 +141,6 @@ spec:
 - Upgrade a release, e.g. `helm upgrade my-api-v2 bitnami/nginx`
 - Undo a helm rollout/upgrade: `helm rollback`
 - Delete an installed release with `helm uninstall <release_name>`
-
-### Cluster administration
-- Drain a node: `k drain [--ignore-daemonsets --force] <node name>`
-  - The kubectl drain subcommand on its own does not actually drain a node of its DaemonSet pods: the DaemonSet controller (part of the control plane) immediately replaces missing Pods with new equivalent Pods.
-  - The DaemonSet controller also creates Pods that ignore unschedulable taints, which allows the new Pods to launch onto a node that you are draining.
-- Resume scheduling **new pods** onto the node: `k uncordon <node name>`
-
-### Pods and containers
-- Startup probes: run at container startup and stop running once they succeed; very similar to liveness probes (which run constantly on a schedule); useful for legacy applications that can have long startup times.
-- Readiness probes: used to prevent user traffic from being sent to pods that are still in the process of starting up (e.g. pod STATUS = Running but READY = "0/1")
-  - Example: for a service backed by multiple container endpoints, user traffic will not be sent to a particular pod until its containers have all passed the readiness checks defined by their readiness probes.
-- Pod’s restart policy: Always (by default), OnFailure (restarted only if error code returned), and Never.
-- Pod with InitContainer(s) will show "Init(0/n)" in their STATUS during initialisation
-- A Mirror Pod represents a Static Pod in the Kubernetes API, allowing you to easily view the Static Pod's status.
-
-### Networking, services, DNS
-- The cluster has a single virtual network spanning across all Nodes.
-- Kubernetes **nodes** will remain `NotReady`, unable to run Pods, until a network plugin is installed. `Starting kube-proxy` will be shown in the nodes logs and no networking pods will exist.
-- Default FQDN:
-  - `<pod-ip-addess-with-dashes>.my-namespace.pod.cluster.local.` 
-  - `my-service-name.my-namespace.svc.cluster.local.` 
-- Ingress: manages external access to Services; more powerful than a simple NodePort Service (e.g. SSL termination, advanced load balancing, or namebased virtual hosting).
 
 [//]: # (### References)
 [//]: # (- https://kubernetes.io/docs/reference/k/cheatsheet/)
