@@ -28,9 +28,11 @@
 ### Create pods
 - Create an nginx pod with `k run my-pod --image=nginx:alpine [--port=80] [’--labels app=my_app]`
 - Create a busybox pod with `k run my-pod --image=busybox $do --command -- sh -c "touch /tmp/ready && sleep 1d" > pod6.yml`
+- Create a busybox pod with `k run my-pod --image=nikolaka/netshoot $do --command -- sh -c "touch /tmp/ready && sleep 1d" > pod6.yml`
 - Create a pod with a volume backed by a config map: `k create -f https://kubernetes.io/examples/pods/pod-configmap-volume.yaml $do > pod.yml`
 - Create a one-shot pod:
-  - to test interactively: `k run my-pod --image busybox --restart=Never --rm -ti`
+  - to test interactively: `k run my-pod --image=busybox --restart=Never --rm -ti`
+  - to test interactively with netshoot: `k run my-pod --image=nicolaka/netshoot --restart=Never --rm -ti`
   - to check a service connection (because the Service is in a different Namespace from the test pod, it is reachable using FQDNs):
 ```
 k run my-pod [--restart=Never] --rm -i --image=nginx:alpine -- curl -m 5 sun-srv.sun:9999
@@ -87,7 +89,7 @@ Connecting to sun-srv.sun:9999 (10.23.253.120:9999)
 - Retrieve a pod status: `k get pod <pod_name> -o json | jq .status.phase`
 - Retrieve pod / container logs: `k logs <pod_name> [-c <container_name>] [-p]` (if pod crashed and restarted, -p option gets logs about the previous instance)
 - List events for a given namespace / all namespaces: `k get events -n <my-namespace>` / `k get events -A` 
-- Show metrics for pods / pod / nodes: `k top pods [--containers] [--sort-by (cpu | memory)]` / `k top pod --selector=XXXX=YYYY` / `k top node [--sort-by (cpu | memory)]`
+- Show metrics for pods / pod / nodes: `k top pods [--containers] [--sort-by (cpu | memory)] [-l app=b]` / `k top pod -l=XXXX=YYYY` / `k top node [--sort-by (cpu | memory)]`
 
 ### Delete / replace resources
 - Force replace a resource: `k replace --force -f ./pod.json`
@@ -135,6 +137,7 @@ spec:
   - The kubectl drain subcommand on its own does not actually drain a node of its DaemonSet pods: the DaemonSet controller (part of the control plane) immediately replaces missing Pods with new equivalent Pods.
   - The DaemonSet controller also creates Pods that ignore unschedulable taints, which allows the new Pods to launch onto a node that you are draining.
 - Resume scheduling **new pods** onto the node: `k uncordon <node name>`
+- To count how many nodes in the cluster are ready to run normal workloads (i.e., workloads that do not have any special tolerations).
 - In a cluster built with `kubeadm`:
   - To check the status of cluster components such as kube-apiserver, check the status of (static) Pods in the kube-system Namespace (kube-apiserver is not set up as a systemctl service).
   - To find logs for the Kubernetes API Server: `k logs -n kube-system <api-server-pod-name>` (the `/var/log/kube-apiserver.log` log file is not available on the host since the API Server runs in a static Pod).
