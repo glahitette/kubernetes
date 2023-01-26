@@ -129,11 +129,16 @@ spec:
 - Endpoints are the underlying entities (such as Pods) that a Service routes traffic to.
 - Ingress: manages external access to Services; more powerful than a simple NodePort Service (e.g. SSL termination, advanced load balancing, or namebased virtual hosting).
 
-### Cluster administration
+### Cluster
 - Drain a node: `k drain [--ignore-daemonsets --force] <node name>`
   - The kubectl drain subcommand on its own does not actually drain a node of its DaemonSet pods: the DaemonSet controller (part of the control plane) immediately replaces missing Pods with new equivalent Pods.
   - The DaemonSet controller also creates Pods that ignore unschedulable taints, which allows the new Pods to launch onto a node that you are draining.
 - Resume scheduling **new pods** onto the node: `k uncordon <node name>`
+- In a cluster built with `kubeadm`:
+  - To check the status of cluster components such as kube-apiserver, check the status of (static) Pods in the kube-system Namespace (kube-apiserver is not set up as a systemctl service).
+  - To find logs for the Kubernetes API Server: `k logs -n kube-system <api-server-pod-name>` (the `/var/log/kube-apiserver.log` log file is not available on the host since the API Server runs in a static Pod).
+  - To find kubelet logs: `sudo journalctl -fu kubelet` (kubelet runs as a standard service).
+  - To investigate DNS issues, check the DNS Pods in the `kube-system` Namespace.
 
 ### Helm
 - List release with `helm [-n my_ns] ls [-a]`
