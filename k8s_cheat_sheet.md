@@ -9,8 +9,9 @@
     * [Delete / replace resources](#delete--replace-resources)
     * [Secrets for ServiceAccount](#secrets-for-serviceaccount)
     * [Networking, network policy, services, DNS](#networking-network-policy-services-dns)
-    * [Cluster administration](#cluster-administration)
+    * [Cluster](#cluster)
     * [Helm](#helm)
+    * [etcd](#etcd)
 <!-- TOC -->
 
 ### General
@@ -156,6 +157,40 @@ spec:
 - Undo a helm rollout/upgrade: `helm rollback`
 - Delete an installed release with `helm uninstall <release_name>`
 
+### etcd
+- etcd is a consistent and highly-available key value store used as Kubernetes' backing store for all cluster data.
+- Backup / restore:
+  - Back Up the etcd Data
+    - From the terminal, log in to the etcd server: `ssh etcd1`
+    - Back up the etcd data:
+```
+ETCDCTL_API=3 etcdctl snapshot save /home/cloud_user/etcd_backup.db \
+--endpoints=https://etcd1:2379 \
+--cacert=/home/cloud_user/etcd-certs/etcd-ca.pem \
+--cert=/home/cloud_user/etcd-certs/etcd-server.crt \
+--key=/home/cloud_user/etcd-certs/etcd-server.key
+```
+  - Restore the etcd Data from the Backup
+    - Stop etcd: `sudo systemctl stop etcd`
+    - Delete the existing etcd data: `sudo rm -rf /var/lib/etcd`
+    - Restore etcd data from a backup:
+```
+sudo ETCDCTL_API=3 etcdctl snapshot restore /home/cloud_user/etcd_backup.db \
+--initial-cluster etcd-restore=https://etcd1:2380 \
+--initial-advertise-peer-urls https://etcd1:2380 \
+--name etcd-restore \
+--data-dir /var/lib/etcd
+```
+    - Set database ownership: `sudo chown -R etcd:etcd /var/lib/etcd`
+    - Start etcd: `sudo systemctl start etcd`
+    - Verify the system is working:
+```
+ETCDCTL_API=3 etcdctl get cluster.name \
+--endpoints=https://etcd1:2379 \
+--cacert=/home/cloud_user/etcd-certs/etcd-ca.pem \
+--cert=/home/cloud_user/etcd-certs/etcd-server.crt \
+--key=/home/cloud_user/etcd-certs/etcd-server.key
+```
 [//]: # (### References)
 [//]: # (- https://kubernetes.io/docs/reference/k/cheatsheet/)
 [//]: # (- https://github.com/dennyzhang/cheatsheet-kubernetes-A4)
