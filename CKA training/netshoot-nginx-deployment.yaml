@@ -1,0 +1,26 @@
+# Source: https://github.com/nicolaka/netshoot/blob/master/configs/netshoot-sidecar.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: netshoot-nginx
+  labels:
+    app: netshoot-nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: netshoot-nginx
+  template:
+    metadata:
+      labels:
+        app: netshoot-nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.14.2
+          ports:
+            - containerPort: 80
+        - name: netshoot
+          image: nicolaka/netshoot
+          command: ["/bin/bash"]
+          args: ["-c", "while true; do ping localhost; sleep 60;done"]
