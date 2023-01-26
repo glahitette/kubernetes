@@ -15,6 +15,13 @@
 <!-- TOC -->
 
 ### General
+- In Mousepad, prepare these setup commands (optionally write them to $HOME/setup.sh)
+````
+git clone https://github.com/glahitette/kubernetes
+cd kubernetes/
+chmod +x bashrc_append.sh
+./bashrc_append.sh
+```
 - To assume root privileges on a server, you can do so with `sudo -i` (only applies to ACG server setup?)
 - Use `grep -A2 Mounts` to show two lines after the line matching `Mounts`
 - Watch pods / deployments / jobs: `k get pods -w` / `k get deployments -w` / `k get jobs -w`
