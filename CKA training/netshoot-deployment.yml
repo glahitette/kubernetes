@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: netshoot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: netshoot
+  template:
+    metadata:
+      labels:
+        name: netshoot
+    spec:
+      # serviceAccountName: netshoot-sa
+      containers:
+        - name: netshoot
+          image: nicolaka/netshoot
+          command: [“sleep”]
+          args: [“infinity”]
+          imagePullPolicy: Always
+#          securityContext:
+#           capabilities:
+#              add: [“NET_ADMIN”]

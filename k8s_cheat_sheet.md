@@ -14,6 +14,7 @@
 <!-- TOC -->
 
 ### General
+- To assume root privileges on a server, you can do so with `sudo -i` (only applies to ACG server setup?)
 - Use `grep -A2 Mounts` to show two lines after the line matching `Mounts`
 - Watch pods / deployments / jobs: `k get pods -w` / `k get deployments -w` / `k get jobs -w`
 - Repeat command every n seconds, example: `watch -n 2 kubectl get pods`
