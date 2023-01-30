@@ -114,6 +114,8 @@ Connecting to sun-srv.sun:9999 (10.23.253.120:9999)
 - Default FQDN:
   - `<pod-ip-addess-with-dashes>.my-namespace.pod.cluster.local.`
   - `my-service-name.my-namespace.svc.cluster.local.`
+- `from` and `to` selectors:
+  ![](np_from_to_selectors.png)
 - Example of deny all policy for labelled pods:
 ```
 apiVersion: networking.k8s.io/v1
@@ -147,8 +149,26 @@ spec:
     - port: 53                # allow DNS TCP
       protocol: TCP
 ```
-- `from` and `to` selectors:
-![](np_from_to_selectors.png)
+- Example of Network Policy that allows all pods in the `users-backend` namespace to communicate with each other only on a specific port (80): first label the namespace: `k label namespace users-backend app=users-backend`then use:
+```
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: np-users-backend-80
+  namespace: users-backend
+spec:
+  podSelector: {} # selects all pods in the specified namespace
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          app: users-backend
+    ports:
+    - protocol: TCP
+      port: 80
+```
 - This policy contains a single from element allowing connections from Pods with the label role=client in namespaces with the label user=alice
 ```
   ingress:
