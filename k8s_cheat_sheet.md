@@ -114,6 +114,18 @@ Connecting to sun-srv.sun:9999 (10.23.253.120:9999)
 - Default FQDN:
   - `<pod-ip-addess-with-dashes>.my-namespace.pod.cluster.local.`
   - `my-service-name.my-namespace.svc.cluster.local.`
+- Example of deny all policy for labelled pods:
+```
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy <...>
+spec:
+  podSelector:
+    matchLabels:
+      app: maintenance
+  policyTypes:
+    - Ingress
+    - Egress
+```
 - Example of egress policy, 1) restricting outgoing tcp connections from frontend to api, 2) still allowing outgoing traffic on UDP/TCP ports 53 for DNS resolution.
 ```
 apiVersion: networking.k8s.io/v1
@@ -137,6 +149,29 @@ spec:
 ```
 - `from` and `to` selectors:
 ![](np_from_to_selectors.png)
+- This policy contains a single from element allowing connections from Pods with the label role=client in namespaces with the label user=alice
+```
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          user: alice
+      podSelector:
+        matchLabels:
+          role: client
+```
+- This policy contains two elements in the `from` array, and allows connections from Pods in the local Namespace with the label role=client, **or** from any Pod in any namespace with the label user=alice.
+```
+  ingress:
+  - from:
+    - namespaceSelector:
+      matchLabels:
+      user: alice
+    - podSelector:
+      matchLabels:
+      role: client
+```
+- When in doubt, use `kubectl describe` to see how Kubernetes has interpreted the policy.
 - Endpoints are the underlying entities (such as Pods) that a Service routes traffic to.
 - Ingress: manages external access to Services; more powerful than a simple NodePort Service (e.g. SSL termination, advanced load balancing, or namebased virtual hosting).
 
