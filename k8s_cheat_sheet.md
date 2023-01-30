@@ -35,8 +35,8 @@ chmod +x bashrc_append.sh
 
 ### Create pods
 - Create an nginx pod with `k run my-pod --image=nginx:alpine [--port=80] [’--labels app=my_app]`
-- Create a busybox pod with `k run my-pod --image=busybox $do --command -- sh -c "touch /tmp/ready && sleep 1d" > pod6.yml`
-- Create a busybox pod with `k run my-pod --image=nikolaka/netshoot $do --command -- sh -c "touch /tmp/ready && sleep 1d" > pod6.yml`
+- Create a busybox pod with `k run my-pod --image=busybox $do --command -- sh -c "touch /tmp/ready && sleep 1d" > my-pod.yml`
+  - Command YAML syntax example: `command: ['sh', '-c', 'while true; do echo success > /output/output.log; sleep 5; done']`
 - Create a pod with a volume backed by a config map: `k create -f https://kubernetes.io/examples/pods/pod-configmap-volume.yaml $do > pod.yml`
 - Create a one-shot pod:
   - to test interactively: `k run my-pod --image=busybox --restart=Never --rm -ti`
