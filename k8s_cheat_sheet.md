@@ -15,8 +15,8 @@
 <!-- TOC -->
 
 ### General
-- In Mousepad, prepare these setup commands (optionally write them to $HOME/setup.sh)
-````
+- In Mousepad, prepare these setup commands:
+```
 git clone https://github.com/glahitette/kubernetes
 cd kubernetes/
 chmod +x bashrc_append.sh
@@ -31,7 +31,7 @@ chmod +x bashrc_append.sh
 - List k8s "internal" pods, sorted by node name: `k get pods -n kube-system --sort-by .spec.nodeName`
 - Scale a deployment and record the command (into Annotations > change-cause): `k scale deployment my-deployment replicas=5 --record`
 - Select the acgk8s cluster to interact: `k config use-context acgk8s`
-- API e.g. for pod manifests : `k explain pods[.child1.child2] | more` OR https://kubernetes.io/docs/reference/kubernetes-api/
+- API e.g. for pod manifests : `k explain pods[.child1.child2] | more`
 
 ### Create pods
 - Create an nginx pod with `k run my-pod --image=nginx:alpine [--port=80] [’--labels app=my_app]`
