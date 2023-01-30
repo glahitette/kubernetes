@@ -151,6 +151,7 @@ spec:
   - To find logs for the Kubernetes API Server: `k logs -n kube-system <api-server-pod-name>` (the `/var/log/kube-apiserver.log` log file is not available on the host since the API Server runs in a static Pod).
   - To find kubelet logs: `sudo journalctl -fu kubelet` (kubelet runs as a standard service).
   - To investigate DNS issues, check the DNS Pods in the `kube-system` Namespace.
+- To upgrade `kubeadm` clusters: [link](CKA%20training/Upgrading%20kubeadm%20clusters.md)
 
 ### Helm
 - List release with `helm [-n my_ns] ls [-a]`
