@@ -17,6 +17,7 @@
 ### General
 - In Mousepad, prepare these setup commands:
 ```
+cp $HOME/.bashrc $HOME/.bashrc_backup # create a backup file, just in case...
 git clone https://github.com/glahitette/kubernetes
 cd kubernetes/
 chmod +x bashrc_append.sh
@@ -87,7 +88,7 @@ chmod +x bashrc_append.sh
 - Retrieve a pod status: `k get pod <pod_name> -o json | jq .status.phase`
 - Retrieve pod / container logs: `k logs <pod_name> [-c <container_name>] [-p]` (if pod crashed and restarted, -p option gets logs about the previous instance)
 - List events for a / all namespace(s): `k get events (-n <my-namespace> | -A)` 
-- Show metrics for pod(s) / nodes: `k top pod [--containers] [--sort-by (cpu | memory)] [-l app=b]` / `k top node [--sort-by (cpu | memory)]`
+- Show metrics for pods (including containers) / nodes: `k top pod [--containers] [--sort-by (cpu | memory)] [-l app=b]` / `k top node [--sort-by (cpu | memory)]`
 
 ### Delete / replace resources
 - Force replace a resource: `k replace --force -f ./pod.json`
