@@ -62,7 +62,7 @@ chmod +x bashrc_append.sh
 - Create a secret (with implicit base64 encoding): `k create secret generic my-secret --from-literal user=test --from-literal pass=pwd`
 - Create an nginx deployment: `k create deployment my-dep --image=nginx $do > my-dep.yml` (deployment name is used as prefix for pods' name)
 - Create a Service...
-  - ...to expose a given pod `k expose pod my-pod --name my-svc --port 3333 --target-port 80` (much faster than creating a service and editing it to set the correct selector labels) 
+  - ...to expose a given pod `k expose pod my-pod --name my-svc --port 3333 --target-port 80` (faster than creating a service and editing its selector labels) 
   - ...for an nginx deployment, which serves on port 80 and connects to the containers on port 8000: `k expose deployment nginx --port=80 --target-port=8000 [--type ClusterIp|NodePort|...] [$do]`
 - Note: A NodePort Service kind of lies on top of a ClusterIP one, making the ClusterIP Service reachable on the Node IPs (internal and external).
 - Create a quota: `k create quota my-quota --hard=cpu=1,memory=1G,pods=2,services=3,replicationcontrollers=2,resourcequotas=1,secrets=5,persistentvolumeclaims=10 [$do]`
@@ -86,8 +86,8 @@ chmod +x bashrc_append.sh
 - Use `k get pods [-A] [--show-labels]`: check `STATUS`, `READY` and `RESTARTS` attributes.
 - Retrieve a pod status: `k get pod <pod_name> -o json | jq .status.phase`
 - Retrieve pod / container logs: `k logs <pod_name> [-c <container_name>] [-p]` (if pod crashed and restarted, -p option gets logs about the previous instance)
-- List events for a given namespace / all namespaces: `k get events (-n <my-namespace> | -A)` 
-- Show metrics for pods / pod / nodes: `k top pods [--containers] [--sort-by (cpu | memory)] [-l app=b]` / `k top pod -l=XXXX=YYYY` / `k top node [--sort-by (cpu | memory)]`
+- List events for a / all namespace(s): `k get events (-n <my-namespace> | -A)` 
+- Show metrics for pod(s) / nodes: `k top pod [--containers] [--sort-by (cpu | memory)] [-l app=b]` / `k top node [--sort-by (cpu | memory)]`
 
 ### Delete / replace resources
 - Force replace a resource: `k replace --force -f ./pod.json`
