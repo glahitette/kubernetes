@@ -8,7 +8,7 @@
     * [Debugging](#debugging)
     * [Delete / replace resources](#delete--replace-resources)
     * [Secrets for ServiceAccount](#secrets-for-serviceaccount)
-    * [Networking, network policy, services, DNS](#networking-network-policy-services-dns)
+    * [Networking, services, DNS](#networking-services-dns)
     * [Cluster](#cluster)
     * [Helm](#helm)
     * [etcd](#etcd)
@@ -22,40 +22,30 @@ cd kubernetes/
 chmod +x bashrc_append.sh
 ./bashrc_append.sh
 ```
-- To assume root privileges on a server, you can do so with `sudo -i` (only applies to ACG server setup?)
+- To assume root privileges: `sudo -i` (only applies to ACG server setup?)
 - Use `grep -A2 Mounts` to show two lines after the line matching `Mounts`
+- Select the `acgk8s` cluster to interact: `k config use-context acgk8s`
 - Watch pods / deployments / jobs: `k get pods -w` / `k get deployments -w` / `k get jobs -w`
 - Repeat command every n seconds, example: `watch -n 2 kubectl get pods`
-- List of resources: `k api-resources`
-- Check all resources at once: `k get all [-A]`
+- Check all resources [in all namespaces]: `k get all [-A]`
 - List k8s "internal" pods, sorted by node name: `k get pods -n kube-system --sort-by .spec.nodeName`
-- Scale a deployment and record the command (into Annotations > change-cause): `k scale deployment my-deployment replicas=5 --record`
-- Select the acgk8s cluster to interact: `k config use-context acgk8s`
+- List of resources: `k api-resources`
 - API e.g. for pod manifests : `k explain pods[.child1.child2] | more`
 
 ### Create pods
-- Create an nginx pod with `k run my-pod --image=nginx:alpine [--port=80] [’--labels app=my_app]`
-- Create a busybox pod with `k run my-pod --image=busybox $do --command -- sh -c "touch /tmp/ready && sleep 1d" > my-pod.yml`
+- Create an nginx pod: `k run my-pod --image=nginx:alpine [--port=80] [’--labels app=my_app]`
+- Create a busybox pod: `k run my-pod --image=busybox $do --command -- sh -c "touch /tmp/ready && sleep 1d" > my-pod.yml`
   - Command YAML syntax example: `command: ['sh', '-c', 'while true; do echo success > /output/output.log; sleep 5; done']`
-- Create a pod with a volume backed by a config map: `k create -f https://kubernetes.io/examples/pods/pod-configmap-volume.yaml $do > pod.yml`
-- Create a one-shot pod:
-  - to test interactively: `k run my-pod --image=busybox --restart=Never --rm -ti`
-  - to test interactively with netshoot: `k run my-pod --image=nicolaka/netshoot --restart=Never --rm -ti`
-  - to check a service connection (because the Service is in a different Namespace from the test pod, it is reachable using FQDNs):
-```
-k run my-pod [--restart=Never] --rm -i --image=nginx:alpine -- curl -m 5 sun-srv.sun:9999
-Connecting to sun-srv.sun:9999 (10.23.253.120:9999)
-<title>Welcome to nginx!</title>
-```
+- Create a throw-away, interactive pod with busybox | netshoot: `k run my-pod --image=(busybox | nicolaka/netshoot) --restart=Never --rm -ti`
 
 ### Test a pod
-- With a command: `k exec my-pod [-c my-container] (-- env | grep SECRET1 || -- cat /tmp/secret2/key)`
+- With a command: `k exec my-pod [-c my-container] (-- env ... | -- cat ...)`
 - In interactive mode: `k exec my-pod [-c my-container] -ti -- sh`
 
 ### Pods, containers and storage
 - Startup probes: run at container startup and stop running once they succeed; very similar to liveness probes (which run constantly on a schedule); useful for legacy applications that can have long startup times.
 - Readiness probes: used to prevent user traffic from being sent to pods that are still in the process of starting up (e.g. pod STATUS = Running but READY = "0/1")
-  - Example: for a service backed by multiple container endpoints, user traffic will not be sent to a particular pod until its containers have all passed the readiness checks defined by their readiness probes.
+  - Example: for a service backed by multiple container endpoints, user traffic will not be sent to a particular pod until its containers have all passed readiness checks.
 - Pod’s restart policy: Always (by default), OnFailure (restarted only if error code returned), and Never.
 - Pod with InitContainer(s) will show "Init(0/n)" in their STATUS during initialisation
 - A Mirror Pod represents a Static Pod in the Kubernetes API, allowing you to easily view the Static Pod's status.
@@ -67,10 +57,10 @@ Connecting to sun-srv.sun:9999 (10.23.253.120:9999)
   -  `allowVolumeExpansion` property of a **StorageClass**, if set to false (per default), prevents from resizing a PersistentVolumeClaim.
 
 ### Create other resources
-- Create a job with `k create job my-job --image=busybox:1.31.0 $do > /opt/course/3/job.yaml -- sh -c "sleep 2 && echo done"` then check the pod execution (no such thing as starting a Job or CronJob!)
+- Create a job with `k create job my-job --image=busybox $do > job.yml -- sh -c "sleep 2 && echo done"` then check the pod execution (no such thing as starting a Job or CronJob!)
 - Create a ConfigMap from a file, with a specific key: `k create configmap my-cm --from-file=index.html=/opt/course/15/web-moon.html`
 - Create a secret (with implicit base64 encoding): `k create secret generic my-secret --from-literal user=test --from-literal pass=pwd`
-- Create an nginx deployment: `k create deployment my-dep --image=nginx:stable $do > my-dep.yml` (deployment name is used as prefix for pods' name)
+- Create an nginx deployment: `k create deployment my-dep --image=nginx $do > my-dep.yml` (deployment name is used as prefix for pods' name)
 - Create a Service...
   - ...to expose a given pod `k expose pod my-pod --name my-svc --port 3333 --target-port 80` (much faster than creating a service and editing it to set the correct selector labels) 
   - ...for an nginx deployment, which serves on port 80 and connects to the containers on port 8000: `k expose deployment nginx --port=80 --target-port=8000 [--type ClusterIp|NodePort|...] [$do]`
@@ -83,20 +73,20 @@ Connecting to sun-srv.sun:9999 (10.23.253.120:9999)
 ### Update resources
 - Add / remove / change a label: `k label pods my-pod app=b` / `k label pods my-pod app-` / `k label pods my-pod app=v2 --overwrite`
 - Add a new label tier=web to all pods having 'app=v2' or 'app=v1' labels: `k label po -l "app in(v1,v2)" tier=web`
-- Change a pod's image (to nginx:1.7.1): `k set image my-pod nginx=nginx:1.7.1 [--record]`
-- Recreate the pods in a deployment: `k rollout restart deploy web-moon`
-- Perform a rolling update (e.g. to change an image): `k edit deployment fish` or `k set image deployment/fish nginx=nginx:1.21.5 [--record]`
-- Check rollout status: `k rollout status deployment/rolling-deployment`
-- Roll back to the previous version: `k rollout undo deployment/rolling-deployment`
-- Scale a deployment: `k scale deployment.v1.apps/my-dep --replicas=5 [--record]`
-- Autoscale a deployment, pods between 5 and 10, targetting CPU utilization at 80%: `k autoscale deploy nginx --min=5 --max=10 --cpu-percent=80`
+- Change a pod's image: `k set image my-pod nginx=nginx:1.7.1 [--record]`
+- Recreate the pods in a deployment: `k rollout restart deploy my-dep`
+- Perform a rolling update (e.g. to change an image): `k edit deployment my-dep` or `k set image deployment my-dep nginx=nginx:1.21.5 [--record]`
+- Check rollout status: `k rollout status deployment my-dep`
+- Roll back to the previous version: `k rollout undo deployment my-dep`
+- Scale a deployment [and record the command (into Annotations > change-cause)]: `k scale deployment my-dep --replicas=5 [--record]`
+- Autoscale a deployment, pods between 5 and 10, targetting CPU utilization at 80%: `k autoscale deploy my-dep --min=5 --max=10 --cpu-percent=80`
   - View the Horizontal Pod Autoscalers (hpa): `k get hpa nginx` 
 
 ### Debugging
 - Use `k get pods [-A] [--show-labels]`: check `STATUS`, `READY` and `RESTARTS` attributes.
 - Retrieve a pod status: `k get pod <pod_name> -o json | jq .status.phase`
 - Retrieve pod / container logs: `k logs <pod_name> [-c <container_name>] [-p]` (if pod crashed and restarted, -p option gets logs about the previous instance)
-- List events for a given namespace / all namespaces: `k get events -n <my-namespace>` / `k get events -A` 
+- List events for a given namespace / all namespaces: `k get events (-n <my-namespace> | -A)` 
 - Show metrics for pods / pod / nodes: `k top pods [--containers] [--sort-by (cpu | memory)] [-l app=b]` / `k top pod -l=XXXX=YYYY` / `k top node [--sort-by (cpu | memory)]`
 
 ### Delete / replace resources
@@ -108,18 +98,16 @@ Connecting to sun-srv.sun:9999 (10.23.253.120:9999)
 - Use `k get secret ...` to get a base64 encoded token 
 - Use `k describe secret ...` to get a base64 decoded token...or pipe it manually through `echo <token> | base64 -d -`
 
-### Networking, network policy, services, DNS
+### Networking, services, DNS
 - The cluster has a single virtual network spanning across all Nodes.
 - Kubernetes **nodes** will remain `NotReady`, unable to run Pods, until a network plugin is installed. `Starting kube-proxy` will be shown in the nodes logs and no networking pods will exist.
 - Default FQDN:
-  - `<pod-ip-addess-with-dashes>.my-namespace.pod.cluster.local.`
-  - `my-service-name.my-namespace.svc.cluster.local.`
+  - `<pod-ip-address-with-dashes>.<my-namespace>.pod.cluster.local.`
+  - `<my-service-name>.<my-namespace>.svc.cluster.local.`
 - `from` and `to` selectors:
   ![](np_from_to_selectors.png)
-- Example of deny all policy for labelled pods:
+- Example of "deny all" policy for labelled pods:
 ```
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy <...>
 spec:
   podSelector:
     matchLabels:
@@ -130,8 +118,6 @@ spec:
 ```
 - Example of egress policy, 1) restricting outgoing tcp connections from frontend to api, 2) still allowing outgoing traffic on UDP/TCP ports 53 for DNS resolution.
 ```
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy <...>
 spec:
   podSelector:
     matchLabels:
@@ -149,10 +135,8 @@ spec:
     - port: 53                # allow DNS TCP
       protocol: TCP
 ```
-- Example of Network Policy that allows all pods in the `users-backend` namespace to communicate with each other only on a specific port (80): first label the namespace: `k label namespace users-backend app=users-backend`then use:
+- Example of Network Policy allowing all pods in the `users-backend` namespace to communicate with each other only on a specific port (80): first label the namespace: `k label namespace users-backend app=users-backend` then use:
 ```
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
 metadata:
   name: np-users-backend-80
   namespace: users-backend
@@ -169,7 +153,7 @@ spec:
     - protocol: TCP
       port: 80
 ```
-- This policy contains a single from element allowing connections from Pods with the label role=client in namespaces with the label user=alice
+- Example policy containing a single `from` element allowing connections from Pods with the label `role=client` in namespaces with the label `user=alice`
 ```
   ingress:
   - from:
@@ -180,18 +164,18 @@ spec:
         matchLabels:
           role: client
 ```
-- This policy contains two elements in the `from` array, and allows connections from Pods in the local Namespace with the label role=client, **or** from any Pod in any namespace with the label user=alice.
+- Example policy containing two elements in the `from` array, allowing connections from Pods in the local Namespace with the label `role=client`, **or** from any Pod in any namespace with the label `user=alice`.
 ```
   ingress:
   - from:
     - namespaceSelector:
-      matchLabels:
-      user: alice
+        matchLabels:
+          user: alice
     - podSelector:
-      matchLabels:
-      role: client
+        matchLabels:
+          role: client
 ```
-- When in doubt, use `kubectl describe` to see how Kubernetes has interpreted the policy.
+- When in doubt, `kubectl describe` shows how Kubernetes has interpreted the policy.
 - Endpoints are the underlying entities (such as Pods) that a Service routes traffic to.
 - Ingress: manages external access to Services; more powerful than a simple NodePort Service (e.g. SSL termination, advanced load balancing, or namebased virtual hosting).
 
@@ -200,9 +184,8 @@ spec:
   - The `kubectl drain` subcommand on its own does not actually drain a node of its DaemonSet pods: the DaemonSet controller (part of the control plane) immediately replaces missing Pods with new equivalent Pods.
   - The DaemonSet controller also creates Pods that ignore unschedulable taints, which allows the new Pods to launch onto a node that you are draining.
 - Resume scheduling **new pods** onto the node: `k uncordon <node name>`
-- To count how many nodes in the cluster are ready to run normal workloads (i.e., workloads that do not have any special tolerations).
 - In a cluster built with `kubeadm`:
-  - To check the status of cluster components such as kube-apiserver, check the status of (static) Pods in the kube-system Namespace (kube-apiserver is not set up as a systemctl service).
+  - To check the status of cluster components such as kube-apiserver, check the status of (static) Pods in the `kube-system` Namespace (kube-apiserver is not set up as a systemctl service).
   - To find logs for the Kubernetes API Server: `k logs -n kube-system <api-server-pod-name>` (the `/var/log/kube-apiserver.log` log file is not available on the host since the API Server runs in a static Pod).
   - To find kubelet logs: `sudo journalctl -fu kubelet` (kubelet runs as a standard service).
   - To investigate DNS issues, check the DNS Pods in the `kube-system` Namespace.
@@ -222,38 +205,8 @@ spec:
 
 ### etcd
 - etcd is a consistent and highly-available key value store used as Kubernetes' backing store for all cluster data.
-- Backup / restore:
-  - Back Up the etcd Data
-    - From the terminal, log in to the etcd server: `ssh etcd1`
-    - Back up the etcd data:
-```
-ETCDCTL_API=3 etcdctl snapshot save /home/cloud_user/etcd_backup.db \
---endpoints=https://etcd1:2379 \
---cacert=/home/cloud_user/etcd-certs/etcd-ca.pem \
---cert=/home/cloud_user/etcd-certs/etcd-server.crt \
---key=/home/cloud_user/etcd-certs/etcd-server.key
-```
-  - Restore the etcd Data from the Backup
-    - Stop etcd: `sudo systemctl stop etcd`
-    - Delete the existing etcd data: `sudo rm -rf /var/lib/etcd`
-    - Restore etcd data from a backup:
-```
-sudo ETCDCTL_API=3 etcdctl snapshot restore /home/cloud_user/etcd_backup.db \
---initial-cluster etcd-restore=https://etcd1:2380 \
---initial-advertise-peer-urls https://etcd1:2380 \
---name etcd-restore \
---data-dir /var/lib/etcd
-```
-    - Set database ownership: `sudo chown -R etcd:etcd /var/lib/etcd`
-    - Start etcd: `sudo systemctl start etcd`
-    - Verify the system is working:
-```
-ETCDCTL_API=3 etcdctl get cluster.name \
---endpoints=https://etcd1:2379 \
---cacert=/home/cloud_user/etcd-certs/etcd-ca.pem \
---cert=/home/cloud_user/etcd-certs/etcd-server.crt \
---key=/home/cloud_user/etcd-certs/etcd-server.key
-```
+- Backup / restore etcd data: [link](CKA%20training/etcd.md)
+
 [//]: # (### References)
 [//]: # (- https://kubernetes.io/docs/reference/k/cheatsheet/)
 [//]: # (- https://github.com/dennyzhang/cheatsheet-kubernetes-A4)
