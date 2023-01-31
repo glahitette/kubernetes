@@ -49,7 +49,6 @@ chmod +x bashrc_append.sh
   - Example: for a service backed by multiple container endpoints, user traffic will not be sent to a particular pod until its containers have all passed readiness checks.
 - Pod’s restart policy: Always (by default), OnFailure (restarted only if error code returned), and Never.
 - Pod with InitContainer(s) will show "Init(0/n)" in their STATUS during initialisation
-- A Mirror Pod represents a Static Pod in the Kubernetes API, allowing you to easily view the Static Pod's status.
 - Volumes:
   - A PersistentVolume’s `persistentVolumeReclaimPolicy` determines how the storage resources can be reused when the PersistentVolume’s associated PersistentVolumeClaims are deleted:
     - `Retain`: Keeps all data. This requires an administrator to manually clean up the data and prepare the storage resource for reuse.
@@ -181,6 +180,10 @@ spec:
 - Ingress: manages external access to Services; more powerful than a simple NodePort Service (e.g. SSL termination, advanced load balancing, or namebased virtual hosting).
 
 ### Cluster
+- Static Pod = a Pod managed directly by `kubelet` on a node, not by the K8s API server; can run even without a K8s API server present; created from YAML manifest files in `/etc/kubernetes/manifest/` by default)
+- Kubelet create a mirror Pod for each static Pod, allowing you to see the status of the static Pod via the K8s API
+- To temporarily stop `kube-scheduler`, log onto the control plane node, move its YAML manifest file (e.g. to /tmp) and restart `kubelet`
+- To manually schedule a Pod on a node, use `pod.spec.nodeName` (not `nodeSelector`); works even if `kube-scheduler` is not running
 - Drain a node: `k drain [--ignore-daemonsets --force] <node name>`
   - The `kubectl drain` subcommand on its own does not actually drain a node of its DaemonSet pods: the DaemonSet controller (part of the control plane) immediately replaces missing Pods with new equivalent Pods.
   - The DaemonSet controller also creates Pods that ignore unschedulable taints, which allows the new Pods to launch onto a node that you are draining.
