@@ -184,6 +184,10 @@ spec:
 - Kubelet create a mirror Pod for each static Pod, allowing you to see the status of the static Pod via the K8s API
 - To temporarily stop `kube-scheduler`, log onto the control plane node, move its YAML manifest file (e.g. to /tmp) and restart `kubelet`
 - To manually schedule a Pod on a node, set `pod.spec.nodeName`, and not `pod.spec.nodeSelector` (works even if `kube-scheduler` is not running)
+- A DaemonSet ensures that all (or some) Nodes run a copy of a Pod (e.g. for  network plugins, cluster storage, logs collection, node monitoring)
+  - As nodes are added to / removed from the cluster, Pods are added / garbage collected. Deleting a DaemonSet will clean up the Pods it created.
+  - `.spec.selector` is a pod selector, immutable and must match `.spec.template.metadata.labels`
+  - By default, DaemonSet pods are created and scheduled by the DaemonSet controller, not the Kubernetes scheduler. `ScheduleDaemonSetPods` allows you to schedule DaemonSets using the default scheduler instead of the DaemonSet controller, by adding the `NodeAffinity` term to the DaemonSet pods, instead of the `.spec.nodeName` term.
 - Drain a node: `k drain [--ignore-daemonsets --force] <node name>`
   - The `kubectl drain` subcommand on its own does not actually drain a node of its DaemonSet pods: the DaemonSet controller (part of the control plane) immediately replaces missing Pods with new equivalent Pods.
   - The DaemonSet controller also creates Pods that ignore unschedulable taints, which allows the new Pods to launch onto a node that you are draining.
