@@ -65,7 +65,7 @@ chmod +x bashrc_append.sh
   - ...to expose a given pod `k expose pod my-pod --name my-svc --port 3333 --target-port 80` (faster than creating a service and editing its selector labels) 
   - ...for an nginx deployment, which serves on port 80 and connects to the containers on port 8000: `k expose deployment nginx --port=80 --target-port=8000 [--type ClusterIp|NodePort|...] [$do]`
 - Note: A NodePort Service kind of lies on top of a ClusterIP one, making the ClusterIP Service reachable on the Node IPs (internal and external).
-- Create a quota: `k create quota my-quota --hard=cpu=1,memory=1G,pods=2,services=3,replicationcontrollers=2,resourcequotas=1,secrets=5,persistentvolumeclaims=10 [$do]`
+- Create a quota: `k create quota my-q --hard=cpu=1,memory=1G,pods=2,services=3... [$do]`
 - Create Role / ClusterRole to permissions within a namespace / cluster-wide: `k create role my-role --verb=get,list,watch --resource=pods,pods/logs`
 - Create RoleBinding / ClusterRoleBinding to connect Roles / ClusterRoles to subjects (users, groups or ServiceAccounts): `k create rolebinding my-rb --role=my-role --user=my-user`
 - Create a service account to allow container processes within Pods to authenticate with the K8s API: `k create sa my-sa`
