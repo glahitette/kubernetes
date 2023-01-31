@@ -32,11 +32,11 @@
 
 ## Building a Cluster With kubeadm
 
-- `kubeadm is a tool that simplifies the process of building Kubernetes clusters.
+- `kubeadm` is a tool that simplifies the process of building Kubernetes clusters.
   - The `kubeadm init` command initializes a control plane.
     - `kubeadm init --config my-config.yml` to pass a yaml file containing cluster custom configuration
-    - kubeadm performs a series of preflight checks to verify that the current environment is suitable for creating or joining to a cluster.
-      - By default, kubeadm will halt execution if any of these preflight checks fails.
+    - `kubeadm` performs a series of preflight checks to verify that the current environment is suitable for creating or joining to a cluster.
+      - By default, `kubeadm` will halt execution if any of these preflight checks fails.
       - `kubeadm init --ignore-preflight-errors all` to ignore such errors
   - The `kubeadm join` command can be used to join a new node to the cluster.
 - Networking add-on: required for a cluster to become fully functional; installed after cluster initialized; example: Calico.

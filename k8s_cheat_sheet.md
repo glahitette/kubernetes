@@ -197,7 +197,7 @@ spec:
 
 ### Cluster
 - Drain a node: `k drain [--ignore-daemonsets --force] <node name>`
-  - The kubectl drain subcommand on its own does not actually drain a node of its DaemonSet pods: the DaemonSet controller (part of the control plane) immediately replaces missing Pods with new equivalent Pods.
+  - The `kubectl drain` subcommand on its own does not actually drain a node of its DaemonSet pods: the DaemonSet controller (part of the control plane) immediately replaces missing Pods with new equivalent Pods.
   - The DaemonSet controller also creates Pods that ignore unschedulable taints, which allows the new Pods to launch onto a node that you are draining.
 - Resume scheduling **new pods** onto the node: `k uncordon <node name>`
 - To count how many nodes in the cluster are ready to run normal workloads (i.e., workloads that do not have any special tolerations).
