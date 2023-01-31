@@ -33,7 +33,7 @@ chmod +x bashrc_append.sh
 - API e.g. for pod manifests : `k explain pods[.child1.child2] | more`
 
 ### Create pods
-- Create an nginx pod: `k run my-pod --image=nginx:alpine [--port=80] [’--labels app=my_app]`
+- Create an nginx pod: `k run my-pod --image=nginx [--port=80] [’--labels app=b]`
 - Create a busybox pod: `k run my-pod --image=busybox $do --command -- sh -c "touch /tmp/ready && sleep 1d" > my-pod.yml`
   - Command YAML syntax example: `command: ['sh', '-c', 'while true; do echo success > /output/output.log; sleep 5; done']`
 - Create a throw-away, interactive pod with busybox | netshoot: `k run my-pod --image=(busybox | nicolaka/netshoot) --restart=Never --rm -ti`
@@ -52,12 +52,12 @@ chmod +x bashrc_append.sh
 - Volumes:
   - A PersistentVolume’s `persistentVolumeReclaimPolicy` determines how the storage resources can be reused when the PersistentVolume’s associated PersistentVolumeClaims are deleted:
     - `Retain`: Keeps all data. This requires an administrator to manually clean up the data and prepare the storage resource for reuse.
-    - `Delete`: Deletes the underlying storage resource automatically (only works for cloud storage resources).
+    - `Delete`: Deletes the underlying storage resource automatically (cloud only).
     - `Recycle`: Automatically deletes all data in the underlying storage resource, allowing the PersistentVolume to be reused.
   -  `allowVolumeExpansion` property of a **StorageClass**, if set to false (per default), prevents from resizing a PersistentVolumeClaim.
 
 ### Create other resources
-- Create a job with `k create job my-job --image=busybox $do > job.yml -- sh -c "sleep 2 && echo done"` then check the pod execution (no such thing as starting a Job or CronJob!)
+- Create a job with `k create job my-job --image=busybox $do > job.yml -- sh -c "sleep 2 && echo done"` then check pod execution (no such thing as starting a Job or CronJob!)
 - Create a ConfigMap from a file, with a specific key: `k create configmap my-cm --from-file=index.html=/opt/course/15/web-moon.html`
 - Create a secret (with implicit base64 encoding): `k create secret generic my-secret --from-literal user=test --from-literal pass=pwd`
 - Create an nginx deployment: `k create deployment my-dep --image=nginx $do > my-dep.yml` (deployment name is used as prefix for pods' name)
@@ -185,11 +185,11 @@ spec:
   - The DaemonSet controller also creates Pods that ignore unschedulable taints, which allows the new Pods to launch onto a node that you are draining.
 - Resume scheduling **new pods** onto the node: `k uncordon <node name>`
 - In a cluster built with `kubeadm`:
-  - To check the status of cluster components such as kube-apiserver, check the status of (static) Pods in the `kube-system` Namespace (kube-apiserver is not set up as a systemctl service).
-  - To find logs for the Kubernetes API Server: `k logs -n kube-system <api-server-pod-name>` (the `/var/log/kube-apiserver.log` log file is not available on the host since the API Server runs in a static Pod).
-  - To find kubelet logs: `sudo journalctl -fu kubelet` (kubelet runs as a standard service).
-  - To investigate DNS issues, check the DNS Pods in the `kube-system` Namespace.
-- To upgrade `kubeadm` clusters: [link](CKA%20training/Upgrading%20kubeadm%20clusters.md)
+  - Check the status of cluster components (e.g. kube-apiserver): check the status of (static) Pods in the `kube-system` Namespace (kube-apiserver is not set up as a systemctl service).
+  - Find logs for the Kubernetes API Server: `k logs -n kube-system <api-server-pod-name>` (the `/var/log/kube-apiserver.log` log file is not available on the host since the API Server runs in a static Pod).
+  - Find kubelet logs: `sudo journalctl -fu kubelet` (kubelet runs as a standard service).
+  - Investigate DNS issues: check the DNS Pods in the `kube-system` Namespace.
+- Upgrade `kubeadm` clusters: [link](CKA%20training/Upgrading%20kubeadm%20clusters.md)
 
 ### Helm
 - List release with `helm [-n my_ns] ls [-a]`
@@ -204,11 +204,5 @@ spec:
 - Delete an installed release with `helm uninstall <release_name>`
 
 ### etcd
-- etcd is a consistent and highly-available key value store used as Kubernetes' backing store for all cluster data.
+- etcd is a consistent and highly-available key value store used to store for all cluster data.
 - Backup / restore etcd data: [link](CKA%20training/etcd.md)
-
-[//]: # (### References)
-[//]: # (- https://kubernetes.io/docs/reference/k/cheatsheet/)
-[//]: # (- https://github.com/dennyzhang/cheatsheet-kubernetes-A4)
-[//]: # (- https://codefresh.io/blog/kubernetes-cheat-sheet/)
-[//]: # (- https://intellipaat.com/blog/tutorial/devops-tutorial/kubernetes-cheat-sheet/)
