@@ -183,7 +183,7 @@ spec:
 - Static Pod = a Pod managed directly by `kubelet` on a node, not by the K8s API server; can run even without a K8s API server present; created from YAML manifest files in `/etc/kubernetes/manifest/` by default)
 - Kubelet create a mirror Pod for each static Pod, allowing you to see the status of the static Pod via the K8s API
 - To temporarily stop `kube-scheduler`, log onto the control plane node, move its YAML manifest file (e.g. to /tmp) and restart `kubelet`
-- To manually schedule a Pod on a node, use `pod.spec.nodeName` (not `nodeSelector`); works even if `kube-scheduler` is not running
+- To manually schedule a Pod on a node, set `pod.spec.nodeName`, and not `pod.spec.nodeSelector` (works even if `kube-scheduler` is not running)
 - Drain a node: `k drain [--ignore-daemonsets --force] <node name>`
   - The `kubectl drain` subcommand on its own does not actually drain a node of its DaemonSet pods: the DaemonSet controller (part of the control plane) immediately replaces missing Pods with new equivalent Pods.
   - The DaemonSet controller also creates Pods that ignore unschedulable taints, which allows the new Pods to launch onto a node that you are draining.
