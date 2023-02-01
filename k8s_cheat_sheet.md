@@ -71,7 +71,7 @@ chmod +x bashrc_append.sh
 - Create a service account to allow container processes within Pods to authenticate with the K8s API: `k create sa my-sa`
 
 ### Update resources
-- Add / remove / change a label: `k label pods my-pod app=b` / `k label pods my-pod app-` / `k label pods my-pod app=v2 --overwrite`
+- Add / delete / change a label: `k label (pods my-pod | nodes my-node) app=b` / `k label pods my-pod app-` / `k label pods my-pod app=v2 --overwrite`
 - Add a new label tier=web to all pods having 'app=v2' or 'app=v1' labels: `k label po -l "app in(v1,v2)" tier=web`
 - Change a pod's image: `k set image my-pod nginx=nginx:1.7.1 [--record]`
 - Recreate the pods in a deployment: `k rollout restart deploy my-dep`
@@ -79,8 +79,8 @@ chmod +x bashrc_append.sh
 - Check rollout status: `k rollout status deployment my-dep`
 - Roll back to the previous version: `k rollout undo deployment my-dep`
 - Scale a deployment [and record the command (into Annotations > change-cause)]: `k scale deployment my-dep --replicas=5 [--record]`
-- Autoscale a deployment, pods between 5 and 10, targetting CPU utilization at 80%: `k autoscale deploy my-dep --min=5 --max=10 --cpu-percent=80`
-  - View the Horizontal Pod Autoscalers (hpa): `k get hpa nginx` 
+- Autoscale a deployment, pods between 5 and 10, targeting CPU utilization at 80%: `k autoscale deploy my-dep --min=5 --max=10 --cpu-percent=80`
+  - View the Horizontal Pod Autoscalers (hpa): `k get hpa nginx`
 
 ### Debugging
 - Use `k get pods [-A] [--show-labels]`: check `STATUS`, `READY` and `RESTARTS` attributes.
