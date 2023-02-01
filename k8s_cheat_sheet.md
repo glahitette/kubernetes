@@ -69,7 +69,7 @@ chmod +x bashrc_append.sh
   - Find kubelet logs: `sudo journalctl -fu kubelet` (kubelet runs as a standard service).
   - Investigate DNS issues: check the DNS Pods in the `kube-system` Namespace.
 - Upgrade `kubeadm` clusters: [link](CKA%20training/Upgrading%20kubeadm%20clusters.md)
-- Scenario: Broken kubelet on node (`NotReady` node status): ssh to the node and:
+- Scenario: Broken `kubelet` on a node (showing as `NotReady`): ssh to the node and:
 ```
 ➜ root@cluster3-node1:~# service kubelet status
 ● kubelet.service - kubelet: The Kubernetes Node Agent
