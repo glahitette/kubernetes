@@ -1,0 +1,36 @@
+# As of now we aren't able to create a DaemonSet directly using kubectl, so we create a Deployment and just change it up:
+# k -n project-tiger create deployment --image=httpd:2.4-alpine ds-important $do > 11.yaml
+apiVersion: apps/v1
+kind: DaemonSet                                     # change from Deployment to Daemonset
+metadata:
+  creationTimestamp: null
+  labels:                                           # add
+    id: ds-important                                # add
+    uuid: 18426a0b-5f59-4e10-923f-c0e078e82462      # add
+  name: ds-important
+  namespace: project-tiger                          # important
+spec:
+  #replicas: 1                                      # remove
+  selector:
+    matchLabels:
+      id: ds-important                              # add
+      uuid: 18426a0b-5f59-4e10-923f-c0e078e82462    # add
+  #strategy: {}                                     # remove
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        id: ds-important                            # add
+        uuid: 18426a0b-5f59-4e10-923f-c0e078e82462  # add
+    spec:
+      containers:
+        - image: httpd:2.4-alpine
+          name: ds-important
+          resources:
+            requests:                                 # add
+              cpu: 10m                                # add
+              memory: 10Mi                            # add
+      tolerations:                                  # add
+        - effect: NoSchedule                          # add
+          key: node-role.kubernetes.io/control-plane  # add
+#status: {}                                         # remove

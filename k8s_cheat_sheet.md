@@ -47,15 +47,39 @@ chmod +x bashrc_append.sh
   - `container runtime`: runs containers (e.g. Docker, containerd)!!! not built into Kubernetes
   - `kube-proxy` is a network proxy, provides networking between containers and services in the cluster.
 
+### Cluster
+- Get Services | pods IPs range: `k cluster-info dump | grep -m 1 (service-cluster-ip-range | cluster-cidr)` or describe the `kube-controller-manager` pod
+- Static Pod = a Pod managed directly by `kubelet` on a node, not by the K8s API server; can run even without a K8s API server present; created from YAML manifest files in `/etc/kubernetes/manifest/` by default)
+- Kubelet create a mirror Pod for each static Pod, allowing you to see the status of the static Pod via the K8s API
+- Networking (CNI plugin) is configured on control plane node(s) under `/etc/cni`, e.g. `/etc/cni/net.d`
+- To temporarily stop `kube-scheduler`, log onto the control plane node, move its YAML manifest file (e.g. to /tmp) and restart `kubelet`
+- To manually schedule a Pod on a node, set `pod.spec.nodeName`, and not `pod.spec.nodeSelector` (works even if `kube-scheduler` is not running)
+- A DaemonSet ensures that all (or some) Nodes run a copy of a Pod (e.g. for  network plugins, cluster storage, logs collection, node monitoring)
+  - To create a DaemonSet, create a Deployment YAML file with `kubectl` and modify (remove `replicas`, `strategy` and add...)
+  - As nodes are added to / removed from the cluster, Pods are added / garbage collected. Deleting a DaemonSet will clean up the Pods it created.
+  - `.spec.selector` is a pod selector, immutable and must match `.spec.template.metadata.labels`
+  - By default, DaemonSet pods are created and scheduled by the DaemonSet controller, not the Kubernetes scheduler. `ScheduleDaemonSetPods` allows you to schedule DaemonSets using the default scheduler instead of the DaemonSet controller, by adding the `NodeAffinity` term to the DaemonSet pods, instead of the `.spec.nodeName` term.
+- Drain a node: `k drain [--ignore-daemonsets --force] <node name>`
+  - The `kubectl drain` subcommand on its own does not actually drain a node of its DaemonSet pods: the DaemonSet controller (part of the control plane) immediately replaces missing Pods with new equivalent Pods.
+  - The DaemonSet controller also creates Pods that ignore unschedulable taints, which allows the new Pods to launch onto a node that you are draining.
+- Resume scheduling **new pods** onto the node: `k uncordon <node name>`
+- In a cluster built with `kubeadm`:
+  - Check the status of cluster components (e.g. kube-apiserver): check the status of (static) Pods in the `kube-system` Namespace (kube-apiserver is not set up as a systemctl service).
+  - Find logs for the Kubernetes API Server: `k logs -n kube-system <api-server-pod-name>` (the `/var/log/kube-apiserver.log` log file is not available on the host since the API Server runs in a static Pod).
+  - Find kubelet logs: `sudo journalctl -fu kubelet` (kubelet runs as a standard service).
+  - Investigate DNS issues: check the DNS Pods in the `kube-system` Namespace.
+- Upgrade `kubeadm` clusters: [link](CKA%20training/Upgrading%20kubeadm%20clusters.md)
+
 ### Create pods
 - Create an nginx pod: `k run my-pod --image=nginx [--port=80] [’--labels app=b]`
 - Create a busybox pod: `k run my-pod --image=busybox $do --command -- sh -c "touch /tmp/ready && sleep 1d" > my-pod.yml`
   - Command YAML syntax example: `command: ['sh', '-c', 'while true; do echo success > /output/output.log; sleep 5; done']`
 - Create a throw-away, interactive pod with busybox | netshoot: `k run my-pod --image=(busybox | nicolaka/netshoot) --restart=Never --rm -ti`
 
-### Test a pod
-- With a command: `k exec my-pod [-c my-container] (-- env ... | -- cat ...)`
-- In interactive mode: `k exec my-pod [-c my-container] -ti -- sh`
+### Test resources
+- Test a pod with a command: `k exec my-pod [-c my-container] (-- env ... | -- cat ...)`
+- Test a pod interactively: `k exec my-pod [-c my-container] -ti -- sh`
+- Test RBAC: `k auth can-i`, example: `k auth can-i create configmap --as system:serviceaccount:project-hamster:processor`
 
 ### Pods, containers and storage
 - Startup probes: run at container startup and stop running once they succeed; very similar to liveness probes (which run constantly on a schedule); useful for legacy applications that can have long startup times.
@@ -63,6 +87,17 @@ chmod +x bashrc_append.sh
   - Example: for a service backed by multiple container endpoints, user traffic will not be sent to a particular pod until its containers have all passed readiness checks.
 - Pod’s restart policy: Always (by default), OnFailure (restarted only if error code returned), and Never.
 - Pod with InitContainer(s) will show "Init(0/n)" in their STATUS during initialisation
+- Set the node name where a Pod is running as environment variable:
+```
+spec:
+  containers:
+    - image: nginx:1.17.6-alpine
+      env:
+        - name: MY_NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+```
 - Volumes:
   - A PersistentVolume’s `persistentVolumeReclaimPolicy` determines how the storage resources can be reused when the PersistentVolume’s associated PersistentVolumeClaims are deleted:
     - `Retain`: Keeps all data. This requires an administrator to manually clean up the data and prepare the storage resource for reuse.
@@ -100,7 +135,7 @@ chmod +x bashrc_append.sh
 - Use `k get pods [-A] [--show-labels]`: check `STATUS`, `READY` and `RESTARTS` attributes.
 - Retrieve a pod status: `k get pod <pod_name> -o json | jq .status.phase`
 - Retrieve pod / container logs: `k logs <pod_name> [-c <container_name>] [-p]` (if pod crashed and restarted, -p option gets logs about the previous instance)
-- List events for a / all namespace(s): `k get events (-n <my-namespace> | -A)` 
+- List events for a / all namespace(s), sorted by time: `k get events (-n <my-namespace> | -A) [--sort-by=.metadata.creationTimestamp]` 
 - Show metrics for pods (including containers) / nodes: `k top pod [--containers] [--sort-by (cpu | memory)] [-l app=b]` / `k top node [--sort-by (cpu | memory)]`
 
 ### Delete / replace resources
@@ -192,27 +227,6 @@ spec:
 - When in doubt, `kubectl describe` shows how Kubernetes has interpreted the policy.
 - Endpoints are the underlying entities (such as Pods) that a Service routes traffic to.
 - Ingress: manages external access to Services; more powerful than a simple NodePort Service (e.g. SSL termination, advanced load balancing, or namebased virtual hosting).
-
-### Cluster
-- Get Services | pods IPs range: `k cluster-info dump | grep -m 1 (service-cluster-ip-range | cluster-cidr)`
-- Static Pod = a Pod managed directly by `kubelet` on a node, not by the K8s API server; can run even without a K8s API server present; created from YAML manifest files in `/etc/kubernetes/manifest/` by default)
-- Kubelet create a mirror Pod for each static Pod, allowing you to see the status of the static Pod via the K8s API
-- To temporarily stop `kube-scheduler`, log onto the control plane node, move its YAML manifest file (e.g. to /tmp) and restart `kubelet`
-- To manually schedule a Pod on a node, set `pod.spec.nodeName`, and not `pod.spec.nodeSelector` (works even if `kube-scheduler` is not running)
-- A DaemonSet ensures that all (or some) Nodes run a copy of a Pod (e.g. for  network plugins, cluster storage, logs collection, node monitoring)
-  - As nodes are added to / removed from the cluster, Pods are added / garbage collected. Deleting a DaemonSet will clean up the Pods it created.
-  - `.spec.selector` is a pod selector, immutable and must match `.spec.template.metadata.labels`
-  - By default, DaemonSet pods are created and scheduled by the DaemonSet controller, not the Kubernetes scheduler. `ScheduleDaemonSetPods` allows you to schedule DaemonSets using the default scheduler instead of the DaemonSet controller, by adding the `NodeAffinity` term to the DaemonSet pods, instead of the `.spec.nodeName` term.
-- Drain a node: `k drain [--ignore-daemonsets --force] <node name>`
-  - The `kubectl drain` subcommand on its own does not actually drain a node of its DaemonSet pods: the DaemonSet controller (part of the control plane) immediately replaces missing Pods with new equivalent Pods.
-  - The DaemonSet controller also creates Pods that ignore unschedulable taints, which allows the new Pods to launch onto a node that you are draining.
-- Resume scheduling **new pods** onto the node: `k uncordon <node name>`
-- In a cluster built with `kubeadm`:
-  - Check the status of cluster components (e.g. kube-apiserver): check the status of (static) Pods in the `kube-system` Namespace (kube-apiserver is not set up as a systemctl service).
-  - Find logs for the Kubernetes API Server: `k logs -n kube-system <api-server-pod-name>` (the `/var/log/kube-apiserver.log` log file is not available on the host since the API Server runs in a static Pod).
-  - Find kubelet logs: `sudo journalctl -fu kubelet` (kubelet runs as a standard service).
-  - Investigate DNS issues: check the DNS Pods in the `kube-system` Namespace.
-- Upgrade `kubeadm` clusters: [link](CKA%20training/Upgrading%20kubeadm%20clusters.md)
 
 ### Helm
 - List release with `helm [-n my_ns] ls [-a]`
