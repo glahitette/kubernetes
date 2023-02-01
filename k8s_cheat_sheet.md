@@ -104,6 +104,12 @@ spec:
     - `Delete`: Deletes the underlying storage resource automatically (cloud only).
     - `Recycle`: Automatically deletes all data in the underlying storage resource, allowing the PersistentVolume to be reused.
   -  `allowVolumeExpansion` property of a **StorageClass**, if set to false (per default), prevents from resizing a PersistentVolumeClaim.
+- Kill the `containerd` container of the `kube-proxy` Pod on a given node: ssh to the node and
+```
+crictl ps | grep kube-proxy
+crictl stop 1e020b43c4423
+crictl rm 1e020b43c4423             # kubelet will restart the container with a new ID
+```
 
 ### Create other resources
 - Create a job with `k create job my-job --image=busybox $do > job.yml -- sh -c "sleep 2 && echo done"` then check pod execution (no such thing as starting a Job or CronJob!)
