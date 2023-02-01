@@ -33,6 +33,20 @@ chmod +x bashrc_append.sh
 - List of resources: `k api-resources`
 - API e.g. for pod manifests : `k explain pods[.child1.child2] | more`
 
+### k8s architecture
+- Control Plane: components managing the cluster itself globally, usually run on dedicated controller machines.
+  - `kube-api-server`: the primary interface to the control plane and the cluster itself.
+  - `kube-scheduler` selects available nodes on which to run containers.
+  - `kube-controller-manager` runs a collection of multiple controller utilities in a single process
+  - `etcd`: the HA backend data store for the Kubernetes cluster.
+  - `cloud-controller-manager`: interface between Kubernetes and various cloud platforms (optional).
+- Nodes: the machines where the containers managed by the cluster run. A cluster can have any number of nodes.
+  - `kubelet`: the Kubernetes agent that runs on each node.
+    - Communicates with the control plane and ensures that containers are run on its node as instructed by the control plane.
+    - Reports container data (e.g. status) back to the control plane.
+  - `container runtime`: runs containers (e.g. Docker, containerd)!!! not built into Kubernetes
+  - `kube-proxy` is a network proxy, provides networking between containers and services in the cluster.
+
 ### Create pods
 - Create an nginx pod: `k run my-pod --image=nginx [--port=80] [’--labels app=b]`
 - Create a busybox pod: `k run my-pod --image=busybox $do --command -- sh -c "touch /tmp/ready && sleep 1d" > my-pod.yml`
@@ -180,6 +194,7 @@ spec:
 - Ingress: manages external access to Services; more powerful than a simple NodePort Service (e.g. SSL termination, advanced load balancing, or namebased virtual hosting).
 
 ### Cluster
+- Get Services | pods IPs range: `k cluster-info dump | grep -m 1 (service-cluster-ip-range | cluster-cidr)`
 - Static Pod = a Pod managed directly by `kubelet` on a node, not by the K8s API server; can run even without a K8s API server present; created from YAML manifest files in `/etc/kubernetes/manifest/` by default)
 - Kubelet create a mirror Pod for each static Pod, allowing you to see the status of the static Pod via the K8s API
 - To temporarily stop `kube-scheduler`, log onto the control plane node, move its YAML manifest file (e.g. to /tmp) and restart `kubelet`
