@@ -30,7 +30,7 @@ chmod +x bashrc_append.sh
 - Repeat command every n seconds, example: `watch -n 2 kubectl get pods`
 - Check all resources [in all namespaces]: `k get all [-A]`
 - List k8s "internal" pods, sorted by node name: `k get pods -n kube-system --sort-by .spec.nodeName`
-- List of resources: `k api-resources`
+- List of all / all namespaced resources: `k api-resources [--namespaced] [-o (wide | name)]`
 - API e.g. for pod manifests : `k explain pods[.child1.child2] | more`
 
 ### k8s architecture
@@ -69,6 +69,23 @@ chmod +x bashrc_append.sh
   - Find kubelet logs: `sudo journalctl -fu kubelet` (kubelet runs as a standard service).
   - Investigate DNS issues: check the DNS Pods in the `kube-system` Namespace.
 - Upgrade `kubeadm` clusters: [link](CKA%20training/Upgrading%20kubeadm%20clusters.md)
+- Scenario: Broken kubelet on node (`NotReady` node status): ssh to the node and:
+```
+➜ root@cluster3-node1:~# service kubelet status
+● kubelet.service - kubelet: The Kubernetes Node Agent
+Loaded: loaded (/lib/systemd/system/kubelet.service; enabled; vendor preset: enabled)
+Drop-In: /etc/systemd/system/kubelet.service.d
+└─10-kubeadm.conf
+Active: inactive (dead) since Sun 2019-12-08 11:30:06 UTC; 50min 52s ago
+...
+
+➜ root@cluster3-node1:~# whereis kubelet
+kubelet: /usr/bin/kubelet
+
+vim /etc/systemd/system/kubelet.service.d/10-kubeadm.conf # fix path to /usr/bin/kubelet
+
+systemctl daemon-reload && systemctl restart kubelet
+```
 
 ### Create pods
 - Create an nginx pod: `k run my-pod --image=nginx [--port=80] [’--labels app=b]`
@@ -110,6 +127,7 @@ crictl ps | grep kube-proxy
 crictl stop 1e020b43c4423
 crictl rm 1e020b43c4423             # kubelet will restart the container with a new ID
 ```
+- To write container logs from worker node to control plane node using `crictl`: `ssh cluster1-node2 'crictl logs b01edbe6f89ed' &> /opt/course/17/pod-container.log # The &> in above's command redirects both the standard output and standard error`
 
 ### Create other resources
 - Create a job with `k create job my-job --image=busybox $do > job.yml -- sh -c "sleep 2 && echo done"` then check pod execution (no such thing as starting a Job or CronJob!)
