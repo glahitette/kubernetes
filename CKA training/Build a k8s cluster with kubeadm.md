@@ -1,4 +1,11 @@
-# Install Packages
+<!-- TOC -->
+    * [Install Packages](#install-packages)
+    * [Initialize the Cluster](#initialize-the-cluster)
+    * [Install the Calico Network Add-On](#install-the-calico-network-add-on)
+    * [Join the Worker Nodes to the Cluster](#join-the-worker-nodes-to-the-cluster)
+<!-- TOC -->
+
+### Install Packages
 Log into the control plane node. (Note: The following steps must be performed on all three nodes.)
 Create configuration file for containerd:
 ```
@@ -68,7 +75,7 @@ sudo apt-get update
 ```
 Install Kubernetes packages (Note: If you get a dpkg lock message, just wait a minute or two before trying the command again):
 ```
-sudo apt-get install -y kubelet=1.24.0-00 kubeadm=1.24.0-00 kubectl=1.24.0-00
+sudo apt-get install -y kubelet=1.26.0-00 kubeadm=1.26.0-00 kubectl=1.26.0-00
 ```
 Turn off automatic updates:
 ```
@@ -76,10 +83,10 @@ sudo apt-mark hold kubelet kubeadm kubectl
 ```
 Log into both worker nodes to perform previous steps.
 
-## Initialize the Cluster
+### Initialize the Cluster
 Initialize the Kubernetes cluster on the control plane node using kubeadm (Note: This is only performed on the Control Plane Node):
 ```
-sudo kubeadm init --pod-network-cidr 192.168.0.0/16 --kubernetes-version 1.24.0
+sudo kubeadm init --pod-network-cidr 192.168.0.0/16 --kubernetes-version 1.26.0
 ```
 Set kubectl access:
 ```
@@ -91,7 +98,7 @@ Test access to cluster:
 ```
 kubectl get nodes
 ```
-## Install the Calico Network Add-On
+### Install the Calico Network Add-On
 On the control plane node, install Calico Networking:
 ```
 kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
@@ -100,12 +107,12 @@ Check status of the control plane node:
 ```
 kubectl get nodes
 ```
-## Join the Worker Nodes to the Cluster
-In the control plane node, create the token and copy the kubeadm join command (NOTE:The join command can also be found in the output from kubeadm init command):
+### Join the Worker Nodes to the Cluster
+In the control plane node, create the token and copy the kubeadm join command:
 ```
 kubeadm token create --print-join-command
 ```
-In both worker nodes, paste the kubeadm join command to join the cluster. Use sudo to run it as root:
+In worker nodes, paste the `kubeadm join` command to join the cluster, as root:
 ```
 sudo kubeadm join ...
 ```
