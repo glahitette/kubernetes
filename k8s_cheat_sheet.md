@@ -69,6 +69,7 @@ chmod +x bashrc_append.sh
   - Find kubelet logs: `sudo journalctl -fu kubelet` (kubelet runs as a standard service).
   - Investigate DNS issues: check the DNS Pods in the `kube-system` Namespace.
 - Upgrade `kubeadm` clusters: [link](CKA%20training/Upgrading%20kubeadm%20clusters.md)
+- Certificates: ssh to control plane node and `kubeadm certs (check-expiration | renew )`
 - Scenario: broken `kubelet` on a node (showing as `NotReady`) with `/usr/bin/local/kubelet`not found error: ssh to the node, find the kubelet service with `systemctl status kubelet`, find the kubelet location with `whereis kubelet`, modify config file `/etc/systemd/system/kubelet.service.d/10-kubeadm.conf`to fix path to /usr/bin/kubelet and `systemctl daemon-reload && systemctl restart kubelet`
 - Scenario: un-initialised (`/etc/kubernetes/kubelet.conf: no such file or directory`), outdated node needing to join the cluster: ssh on node, `apt install kubectl=1.26.0-00 kubelet=1.26.0-00` then ssh on control plane, `kubeadm token create --print-join-command` then `sudo kubeadm join ...` command from node
 
