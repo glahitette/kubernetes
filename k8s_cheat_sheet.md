@@ -40,19 +40,19 @@ chmod +x bashrc_append.sh
   - `kube-controller-manager` runs a collection of multiple controller utilities in a single process
   - `etcd`: the HA backend data store for the Kubernetes cluster.
   - `cloud-controller-manager`: interface between Kubernetes and various cloud platforms (optional).
-- Nodes: the machines where the containers managed by the cluster run. A cluster can have any number of nodes.
+- Nodes: the machines where the containers run. A cluster can have any number of nodes
   - `kubelet`: the Kubernetes agent that runs on each node.
-    - Communicates with the control plane and ensures that containers are run on its node as instructed by the control plane.
+    - Ensures that containers are run on its node, as instructed by the control plane.
     - Reports container data (e.g. status) back to the control plane.
   - `container runtime`: runs containers (e.g. Docker, containerd)!!! not built into Kubernetes
   - `kube-proxy` is a network proxy, provides networking between containers and services in the cluster.
 
 ### Cluster
 - Get Services | pods IPs range: `k cluster-info dump | grep -m 1 (service-cluster-ip-range | cluster-cidr)` or describe the `kube-controller-manager` pod
-- Static Pod = a Pod managed directly by `kubelet` on a node, not by the K8s API server; can run even without a K8s API server present; created from YAML manifest files in `/etc/kubernetes/manifest/` by default)
-- Kubelet create a mirror Pod for each static Pod, allowing you to see the status of the static Pod via the K8s API
+- Static Pod = a Pod managed directly by `kubelet` on a node, not by the K8s API server; can run even without a K8s API server present; created from YAML manifest files in `/etc/kubernetes/manifest/` (by default)
+- `kubelet` creates a mirror Pod for each static Pod, sharing the status of the static Pod to the k8s API
 - Networking (CNI plugin) is configured on control plane node(s) under `/etc/cni`, e.g. `/etc/cni/net.d`
-- To temporarily stop `kube-scheduler`, log onto the control plane node, move its YAML manifest file (e.g. to /tmp) and restart `kubelet`
+- To temporarily stop `kube-scheduler`, log onto the control plane node, move its YAML manifest file (e.g. to ..) and restart `kubelet`
 - To manually schedule a Pod on a node, set `pod.spec.nodeName`, and not `pod.spec.nodeSelector` (works even if `kube-scheduler` is not running)
 - Pod termination: when available cpu or memory resources on the nodes reach their limit, first candidates for termination are Pods using more resources than they requested (by default containers without resource requests/limits set).
 - A DaemonSet ensures that all (or some) Nodes run a copy of a Pod (e.g. for  network plugins, cluster storage, logs collection, node monitoring)
@@ -69,18 +69,18 @@ chmod +x bashrc_append.sh
   - Find logs for the Kubernetes API Server: `k logs -n kube-system <api-server-pod-name>` (the `/var/log/kube-apiserver.log` log file is not available on the host since the API Server runs in a static Pod).
   - Find kubelet logs: `sudo journalctl -fu kubelet` (kubelet runs as a standard service).
   - Investigate DNS issues: check the DNS Pods in the `kube-system` Namespace.
-- Upgrade `kubeadm` clusters: [link](CKA%20training/Upgrading%20kubeadm%20clusters.md)
+- Build / upgrade `kubeadm` clusters: [link](CKA%20training/Build%20kubeadm%20clusters.md) / [link](CKA%20training/Upgrade%20kubeadm%20clusters.md)
 - Certificates: for Kube API server certificates, ssh to control plane node and `kubeadm certs (check-expiration | renew )`
 - Certificates: for kubelet client/server certificates, ssh to the node, check `--cert-dir` parameter for the kubelet or `/etc/systemd/system/kubelet.service.d/10-kubeadm.conf` and `openssl x509  -noout -text -in /var/lib/kubelet/pki/kubelet-client-current.pem | grep Issuer` or `openssl x509  -noout -text -in /var/lib/kubelet/pki/kubelet.crt | grep "Extended Key Usage" -A1`
-- Scenario: broken `kubelet` on a node (showing as `NotReady`) with `/usr/bin/local/kubelet`not found error: ssh to the node, find the kubelet service with `systemctl status kubelet`, find the kubelet location with `whereis kubelet`, modify config file `/etc/systemd/system/kubelet.service.d/10-kubeadm.conf`to fix path to /usr/bin/kubelet and `systemctl daemon-reload && systemctl restart kubelet`
+- Scenario: broken `kubelet` on a node (showing as `NotReady`) with `/usr/bin/local/kubelet` not found error: ssh to the node, find the kubelet service config file with `systemctl status kubelet`, find the kubelet location with `whereis kubelet`, modify config file `/etc/systemd/system/kubelet.service.d/10-kubeadm.conf` to fix path to `/usr/bin/kubelet` and `systemctl daemon-reload && systemctl restart kubelet`
 - Scenario: un-initialised (`/etc/kubernetes/kubelet.conf: no such file or directory`), outdated node needing to join the cluster: ssh on node, `apt install kubectl=1.26.0-00 kubelet=1.26.0-00` then ssh on control plane, `kubeadm token create --print-join-command` then `sudo kubeadm join ...` command from node
 - Scenario: curl the k8s API from a test pod using a ServiceAccount `secret-reader`: retrieve the ServiceAccount token `TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)` and `curl -k https://kubernetes.default/api/v1/secrets -H "Authorization: Bearer ${TOKEN}"`
   - To use encrypted https connection: `CACERT=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt` and `curl --cacert ${CACERT} https://kubernetes.default/api/v1/secrets -H "Authorization: Bearer ${TOKEN}"`
 
 ### Create pods
-- Create an nginx pod: `k run my-pod --image=nginx [--port=80] [’--labels app=b]`
-- Create a busybox pod: `k run my-pod --image=busybox $do --command -- sh -c "touch /tmp/ready && sleep 1d" > my-pod.yml`
-  - Command YAML syntax example: `command: ['sh', '-c', 'while true; do echo success > /output/output.log; sleep 5; done']`
+- Create an nginx pod: `k run my-pod --image=nginx [--port=80] [--labels app=b]`
+- Create a busybox pod: `k run my-pod --image=busybox $do --command -- sh -c "sleep 1d"`
+  - Command YAML syntax example: `command: ['sh', '-c', 'sleep 1; done']`
 - Create a throw-away, interactive pod with busybox | netshoot: `k run my-pod --image=(busybox | nicolaka/netshoot) --restart=Never --rm -ti`
 
 ### Test resources
@@ -125,8 +125,8 @@ crictl rm 1e020b43c4423             # kubelet will restart the container with a 
 - Create a secret (with implicit base64 encoding): `k create secret generic my-secret --from-literal user=test --from-literal pass=pwd`
 - Create an nginx deployment: `k create deployment my-dep --image=nginx $do > my-dep.yml` (deployment name is used as prefix for pods' name)
 - Create a Service...to expose a...(faster than creating a service and editing its selector labels)
-  - pod: `k expose pod my-pod --name my-svc [--type ClusterIp|NodePort|...] --port 3333 --target-port 80 [$do]`  
-  - deployment: `k expose deployment nginx [--type ClusterIp|NodePort|...] --port=80 --target-port=8080 [$do]`
+  - pod: `k expose pod my-pod --name my-svc [--type ClusterIp|NodePort|...] --port 3333 --target-port 80`  
+  - deployment: `k expose deployment nginx [--type ClusterIp|NodePort|...] --port=80 --target-port=8080`
 - Note: A NodePort Service kind of lies on top of a ClusterIP one, making the ClusterIP Service reachable on the Node IPs (internal and external).
 - Create a quota: `k create quota my-q --hard=cpu=1,memory=1G,pods=2,services=3... [$do]`
 - Create Role / ClusterRole to permissions within a namespace / cluster-wide: `k create role my-role --verb=get,list,watch --resource=pods,pods/logs`
@@ -165,7 +165,7 @@ crictl rm 1e020b43c4423             # kubelet will restart the container with a 
 
 ### Networking, services, DNS
 - The cluster has a single virtual network spanning across all Nodes.
-- Kubernetes **nodes** will remain `NotReady`, unable to run Pods, until a network plugin is installed. `Starting kube-proxy` will be shown in the nodes logs and no networking pods will exist.
+- Nodes remain `NotReady`, unable to run Pods, until a network plugin is installed. `Starting kube-proxy` is shown in the nodes logs and no networking pods exist.
 - Default FQDN:
   - `<pod-ip-address-with-dashes>.<my-namespace>.pod.cluster.local.`
   - `<my-service-name>.<my-namespace>.svc.cluster.local.`
