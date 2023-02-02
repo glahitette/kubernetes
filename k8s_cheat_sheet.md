@@ -117,7 +117,7 @@ crictl ps | grep kube-proxy
 crictl stop 1e020b43c4423
 crictl rm 1e020b43c4423             # kubelet will restart the container with a new ID
 ```
-- To write container logs from worker node to control plane node using `crictl`: `ssh cluster1-node2 'crictl logs b01edbe6f89ed' &> /opt/course/17/pod-container.log # The &> in above's command redirects both the standard output and standard error`
+- To read container logs from worker node using `crictl` and write them to exam server: `ssh cluster1-node2 'crictl logs b01edbe6f89ed' &> /opt/course/17/pod-container.log # The &> in above's command redirects both the standard output and standard error`
 
 ### Create other resources
 - Create a job with `k create job my-job --image=busybox $do > job.yml -- sh -c "sleep 2 && echo done"` then check pod execution (no such thing as starting a Job or CronJob!)
