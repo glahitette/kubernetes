@@ -1,0 +1,26 @@
+# WRONG
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: np-backend
+  namespace: project-snake
+spec:
+  podSelector:
+    matchLabels:
+      app: backend
+  policyTypes:
+    - Egress
+  egress:
+    -                           # first rule
+      to:                           # first condition "to"
+        - podSelector:                    # first "to" possibility
+            matchLabels:
+              app: db1
+        - podSelector:                    # second "to" possibility
+            matchLabels:
+              app: db2
+      ports:                        # second condition "ports"
+        - protocol: TCP                   # first "ports" possibility
+          port: 1111
+        - protocol: TCP                   # second "ports" possibility
+          port: 2222
