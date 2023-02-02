@@ -161,6 +161,7 @@ crictl rm 1e020b43c4423             # kubelet will restart the container with a 
 - Retrieve pod / container logs: `k logs <pod_name> [-c <container_name>] [-p]` (if pod crashed and restarted, -p option gets logs about the previous instance)
 - List events for a / all namespace(s), sorted by time: `k get events (-n <my-namespace> | -A) [--sort-by=.metadata.creationTimestamp]` 
 - Show metrics for pods (including containers) / nodes: `k top pod [--containers] [--sort-by (cpu | memory)] [-l app=b]` / `k top node [--sort-by (cpu | memory)]`
+- Warning `Back off restarting failed container x in pod y`: possible cause is a missing `command` for a busybox container
 
 ### Delete / replace resources
 - Force replace a resource: `k replace --force -f ./pod.json`

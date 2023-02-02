@@ -1,6 +1,6 @@
 ### Upgrade the Control Plane
-- `export K8S_VERSION=v1.22.2 && echo $K8S_VERSION`
-- `export K8S_VERSION_LONG=1.22.2-00 && echo $K8S_VERSION_LONG`
+- `export K8S_VERSION=v1.26.0 && echo $K8S_VERSION`
+- `export K8S_VERSION_LONG=1.26.0-00 && echo $K8S_VERSION_LONG`
 - `export NODE_NAME=k8s-control && echo $NODE_NAME`
 - Upgrade kubeadm: `sudo apt-get update && sudo apt-get install -y --allow-change-held-packages kubeadm=$K8S_VERSION_LONG`
   - Use `apt` instead of `apt-get` as needed
@@ -18,7 +18,7 @@
 - Run the following on the control plane node to drain worker node 1: `k drain $NODE_NAME --ignore-daemonsets --force`
   - You may get an error message that certain pods couldn't be deleted, which is fine.
 - In a new terminal window, log in to worker node 1
-  - `export K8S_VERSION_LONG=1.22.2-00 && echo $K8S_VERSION_LONG`
+  - `export K8S_VERSION_LONG=1.26.0-00 && echo $K8S_VERSION_LONG`
   - Upgrade kubeadm on worker node 1: `sudo apt-get update && sudo apt-get install -y --allow-change-held-packages kubeadm=$K8S_VERSION_LONG`
   - Upgrade the kubelet configuration on the worker node: `sudo kubeadm upgrade node`
   - Upgrade kubelet and kubectl on worker node 1: `sudo apt-get update && sudo apt-get install -y --allow-change-held-packages kubelet=$K8S_VERSION_LONG kubectl=$K8S_VERSION_LONG`
