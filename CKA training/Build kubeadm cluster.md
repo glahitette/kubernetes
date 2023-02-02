@@ -81,7 +81,7 @@ Turn off automatic updates:
 ```
 sudo apt-mark hold kubelet kubeadm kubectl
 ```
-Log into both worker nodes to perform previous steps.
+Log into worker nodes to perform previous steps.
 
 ### Initialize the Cluster
 Initialize the Kubernetes cluster on the control plane node using kubeadm (Note: This is only performed on the Control Plane Node):
