@@ -54,6 +54,7 @@ chmod +x bashrc_append.sh
 - Networking (CNI plugin) is configured on control plane node(s) under `/etc/cni`, e.g. `/etc/cni/net.d`
 - To temporarily stop `kube-scheduler`, log onto the control plane node, move its YAML manifest file (e.g. to /tmp) and restart `kubelet`
 - To manually schedule a Pod on a node, set `pod.spec.nodeName`, and not `pod.spec.nodeSelector` (works even if `kube-scheduler` is not running)
+- Pod termination: when available cpu or memory resources on the nodes reach their limit, first candidates for termination are Pods using more resources than they requested (by default containers without resource requests/limits set).
 - A DaemonSet ensures that all (or some) Nodes run a copy of a Pod (e.g. for  network plugins, cluster storage, logs collection, node monitoring)
   - To create a DaemonSet, create a Deployment YAML file with `kubectl` and modify (remove `replicas`, `strategy` and add...)
   - As nodes are added to / removed from the cluster, Pods are added / garbage collected. Deleting a DaemonSet will clean up the Pods it created.
@@ -145,6 +146,7 @@ crictl rm 1e020b43c4423             # kubelet will restart the container with a 
 ### Debugging
 - Use `k get pods [-A] [--show-labels]`: check `STATUS`, `READY` and `RESTARTS` attributes.
 - Retrieve a pod status: `k get pod <pod_name> -o json | jq .status.phase`
+- Retrieve pod names, their resources and QoS class: `k get pod -o jsonpath="{range .items[*]}{.metadata.name} - {.spec.containers[*].resources} - {.status.qosClass}{'\n'}"`
 - Retrieve pod / container logs: `k logs <pod_name> [-c <container_name>] [-p]` (if pod crashed and restarted, -p option gets logs about the previous instance)
 - List events for a / all namespace(s), sorted by time: `k get events (-n <my-namespace> | -A) [--sort-by=.metadata.creationTimestamp]` 
 - Show metrics for pods (including containers) / nodes: `k top pod [--containers] [--sort-by (cpu | memory)] [-l app=b]` / `k top node [--sort-by (cpu | memory)]`
