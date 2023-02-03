@@ -48,7 +48,7 @@ chmod +x bashrc_append.sh
   - `kube-proxy` is a network proxy, provides networking between containers and services in the cluster.
 
 ### Cluster
-- Get Services | pods IPs range: `k cluster-info dump | grep -m 1 (service-cluster-ip-range | cluster-cidr)` or describe the `kube-controller-manager` pod
+- Get Services | pods IPs range: describe the `kube-controller-manager` pod OR `k cluster-info dump | grep -m 1 (service-cluster-ip-range | cluster-cidr)`
 - Static Pod = a Pod managed directly by `kubelet` on a node, not by the K8s API server; can run even without a K8s API server present; created from YAML manifest files in `/etc/kubernetes/manifest/` (by default)
 - `kubelet` creates a mirror Pod for each static Pod, sharing the status of the static Pod to the k8s API
 - Networking (CNI plugin) is configured on control plane node(s) under `/etc/cni`, e.g. `/etc/cni/net.d`
