@@ -200,13 +200,13 @@ spec:
     - port: 53                # allow DNS TCP
       protocol: TCP
 ```
-- Example of Network Policy allowing all pods in the `users-backend` namespace to communicate with each other only on a specific port (80): first label the namespace: `k label namespace users-backend app=users-backend` then use:
+- Example policy allowing all pods in the `users-backend` namespace to communicate with each other only on a specific port (80): first label the namespace: `k label namespace users-backend app=users-backend`:
 ```
 metadata:
   name: np-users-backend-80
   namespace: users-backend
 spec:
-  podSelector: {} # selects all pods in the specified namespace
+  podSelector: {}           # selects all pods in the specified namespace
   policyTypes:
   - Ingress
   ingress:
