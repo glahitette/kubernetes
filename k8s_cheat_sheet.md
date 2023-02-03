@@ -107,9 +107,9 @@ spec:
 ```
 - Volumes:
   - A PersistentVolume’s `persistentVolumeReclaimPolicy` determines how the storage resources can be reused when the PersistentVolume’s associated PersistentVolumeClaims are deleted:
-    - `Retain`: Keeps all data. This requires an administrator to manually clean up the data and prepare the storage resource for reuse.
+    - `Retain`: Keeps all data. An administrator must manually clean up the data to prepare the storage resource for reuse.
     - `Delete`: Deletes the underlying storage resource automatically (cloud only).
-    - `Recycle`: Automatically deletes all data in the underlying storage resource, allowing the PersistentVolume to be reused.
+    - `Recycle`: Automatically deletes all data, allowing the PersistentVolume to be reused.
   -  `allowVolumeExpansion` property of a **StorageClass**, if set to false (per default), prevents from resizing a PersistentVolumeClaim.
 - Kill the `containerd` container of the `kube-proxy` Pod on a given node: ssh to the node and
 ```
@@ -128,10 +128,10 @@ crictl rm 1e020b43c4423             # kubelet will restart the container with a 
   - pod: `k expose pod my-pod --name my-svc [--type ClusterIp|NodePort|...] --port 3333 --target-port 80`  
   - deployment: `k expose deployment nginx [--type ClusterIp|NodePort|...] --port=80 --target-port=8080`
 - Note: A NodePort Service kind of lies on top of a ClusterIP one, making the ClusterIP Service reachable on the Node IPs (internal and external).
-- Create a quota: `k create quota my-q --hard=cpu=1,memory=1G,pods=2,services=3... [$do]`
 - Create Role / ClusterRole to permissions within a namespace / cluster-wide: `k create role my-role --verb=get,list,watch --resource=pods,pods/logs`
 - Create RoleBinding / ClusterRoleBinding to connect Roles / ClusterRoles to subjects (users, groups or ServiceAccounts): `k create rolebinding my-rb --role=my-role --user=my-user`
-- Create a service account to allow container processes within Pods to authenticate with the K8s API: `k create sa my-sa`
+- Create a service account, allowing container processes within Pods to authenticate with the K8s API: `k create sa my-sa`
+- Create a quota: `k create quota my-q --hard=cpu=1,memory=1G,pods=2,services=3... [$do]`
 
 ### Update resources
 - Add / delete / change a label: `k label (pods my-pod | nodes my-node) app=b` / `k label pods my-pod app-` / `k label pods my-pod app=v2 --overwrite`
@@ -142,7 +142,7 @@ crictl rm 1e020b43c4423             # kubelet will restart the container with a 
 - Check rollout status: `k rollout status deployment my-dep`
 - Roll back to the previous version: `k rollout undo deployment my-dep`
 - Scale a deployment [and record the command (into Annotations > change-cause)]: `k scale deployment my-dep --replicas=5 [--record]`
-- Autoscale a deployment, pods between 5 and 10, targeting CPU utilization at 80%: `k autoscale deploy my-dep --min=5 --max=10 --cpu-percent=80`
+- Autoscale a deployment, from 5 to 10 pods, targeting CPU utilization at 80%: `k autoscale deploy my-dep --min=5 --max=10 --cpu-percent=80`
   - View the Horizontal Pod Autoscalers (hpa): `k get hpa nginx`
 
 ### Debugging
@@ -158,13 +158,13 @@ crictl rm 1e020b43c4423             # kubelet will restart the container with a 
 - Force replace a resource: `k replace --force -f ./pod.json`
 - Delete pods and services using their label: `k delete pods,services -l app=b $now`
 
-### Secrets for ServiceAccount
-- If a Secret belongs to a ServiceAccount, it'll have the annotation `kubernetes.io/service-account.name`
+### Secrets
 - Use `k get secret ...` to get a base64 encoded token 
 - Use `k describe secret ...` to get a base64 decoded token...or pipe it manually through `echo <token> | base64 -d -`
+- If a Secret belongs to a ServiceAccount, it'll have the annotation `kubernetes.io/service-account.name`
 
 ### Networking, services, DNS
-- The cluster has a single virtual network spanning across all Nodes.
+- The cluster has a single virtual network spanning across all nodes.
 - Nodes remain `NotReady`, unable to run Pods, until a network plugin is installed. `Starting kube-proxy` is shown in the nodes logs and no networking pods exist.
 - Default FQDN:
   - `<pod-ip-address-with-dashes>.<my-namespace>.pod.cluster.local.`
