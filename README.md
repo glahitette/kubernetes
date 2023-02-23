@@ -2,6 +2,7 @@
 
 ## Shell setup
 
+- `git clone https://github.com/glahitette/kubernetes && cd kubernetes && chmod +x bashrc_append.sh && cp $HOME/.bashrc $HOME/.bashrc_backup && ./bashrc_append.sh`
 - Use the [.bashrc](.bashrc) file
 - Use the [bashrc_append.sh](bashrc_append.sh) script to append to the ~/.bashrc file
 

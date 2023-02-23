@@ -19,3 +19,6 @@ echo "complete -F __start_kubectl k" >> ~/.bashrc
 echo "export do='--dry-run=client -o yaml'" >> ~/.bashrc
 echo "export now='--force --grace-period 0'" >> ~/.bashrc
 bash
+c
+h
+echo "All set! Now run"
