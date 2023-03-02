@@ -4,9 +4,10 @@ server:
       namespace: argocd
       project: default
       source:
-        repoURL: https://github.com/piomin/sample-terraform-kubernetes-argocd.git
+        # repoURL: https://github.com/piomin/sample-terraform-kubernetes-argocd.git
+        repoURL: https://github.com/glahitette/kubernetes.git
         targetRevision: HEAD
-        path: argocd/manifests/cluster
+        path: terraform-kubernetes-argocd/argocd/manifests/cluster
         directory:
           recurse: true
       destination:
