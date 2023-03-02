@@ -3,7 +3,7 @@ Reference: https://piotrminkowski.com/2022/06/28/manage-kubernetes-cluster-with-
 ```shell
 terraform init
 
-terraform apply
+terraform apply -auto-approve
 
 kubectl port-forward service/argocd-server 8443:443 -n argocd
 
