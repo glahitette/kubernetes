@@ -90,6 +90,7 @@ chmod +x bashrc_append.sh
 - Test RBAC: `k auth can-i`, example: `k auth can-i create configmap --as system:serviceaccount:project-hamster:processor`
 
 ### Pods, containers and storage
+- Delete all failed pods: `k get pods --all-namespaces | grep Evicted | awk '{print $2 " --namespace=" $1}' | xargs kubectl delete pod` [//]: # (https://gist.github.com/zparnold/0e72d7d3563da2704b900e3b953a8229)
 - Startup probes: run at container startup and stop running once they succeed; very similar to liveness probes (which run constantly on a schedule); useful for legacy applications that can have long startup times.
 - Readiness probes: used to prevent user traffic from being sent to pods that are still in the process of starting up (e.g. pod STATUS = Running but READY = "0/1")
   - Example: for a service backed by multiple container endpoints, user traffic will not be sent to a particular pod until its containers have all passed readiness checks.
@@ -157,7 +158,7 @@ crictl rm 1e020b43c4423             # kubelet will restart the container with a 
 
 ### Delete / replace resources
 - Force replace a resource: `k replace --force -f ./pod.json`
-- Delete pods and services using their label: `k delete pods,services -l app=b $now`
+- Delete pods and services using their label: `k delete pods,services -l app=b (--ignore-not-found=true) $now`
 
 ### Secrets
 - Use `k get secret ...` to get a base64 encoded token 
