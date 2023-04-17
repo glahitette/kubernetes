@@ -1,6 +1,6 @@
 <!-- TOC -->
-    * [General](#general)
     * [ArgoCD](#argocd)
+    * [App of Apps pattern](#app-of-apps-pattern)
     * [Argo Rollouts](#argo-rollouts)
     * [External cluster](#external-cluster)
     * [ApplicationSets](#applicationsets)
@@ -8,14 +8,24 @@
 
 ### ArgoCD
 
-- Create application:
+- Create application to `default` project, `default` namespace and manual (none) sync policy, then sync it:
 ```
-argocd app create demo --project default --sync-policy auto --dest-server https://kubernetes.default.svc --dest-namespace default \
+argocd app create guestbook --repo https://github.com/argoproj/argocd-example-apps.git --path guestbook \
+--dest-namespace default --dest-server https://kubernetes.default.svc
+argocd app sync guestbook
+```
+- Create application to `default` project, `default` namespace with auto sync policy, auto prune and self healing:
+```
+argocd app create demo --sync-policy auto --dest-namespace default --dest-server https://kubernetes.default.svc \
 --repo https://github.com/glahitette/gitops-certification-examples \
---path "./helm-app/" \
+--path helm-app \
 --sync-option Prune=true --self-heal
 ```
-- 
+- Create a Helm application to `default` namespace
+```
+argocd app create helm-guestbook --repo https://github.com/argoproj/argocd-example-apps.git --path helm-guestbook --dest-namespace default \
+--dest-server https://kubernetes.default.svc --helm-set replicaCount=2
+```
 
 ### App of Apps pattern
 
@@ -74,6 +84,7 @@ prune: true
 ```
 
 - def
+```
 ```
 
 ### Argo Rollouts
