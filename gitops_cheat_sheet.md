@@ -1,4 +1,5 @@
 <!-- TOC -->
+    * [References:](#references)
     * [ArgoCD](#argocd)
     * [ArgoCD CLI](#argocd-cli)
     * [Managing secrets in GitOps](#managing-secrets-in-gitops)
@@ -9,12 +10,8 @@
 <!-- TOC -->
 
 ### References:
-- Courses
-  - Fundamentals: https://learning.codefresh.io/course/gitops-fundamentals
-  - At scale: https://learning.codefresh.io/course/gitops-scale
-- Git repos
-  - Fundamentals: https://github.com/glahitette/gitops-certification-examples, forked from https://github.com/codefresh-contrib/gitops-certification-examples
-  - At scale: https://github.com/glahitette/gitops-cert-level-2-examples/, forked from https://github.com/codefresh-contrib/gitops-cert-level-2-examples
+- GitOps Fundamentals: [course]|(https://learning.codefresh.io/course/gitops-fundamentals), https://github.com/glahitette/gitops-certification-examples (forked from https://github.com/codefresh-contrib/gitops-certification-examples) 
+- GitOps At Scale: [course]|(https://learning.codefresh.io/course/gitops-scale), https://github.com/glahitette/gitops-cert-level-2-examples/ (forked from https://github.com/codefresh-contrib/gitops-cert-level-2-examples)
 
 ### ArgoCD
 
@@ -52,7 +49,13 @@ argocd app create helm-guestbook --repo https://github.com/argoproj/argocd-examp
 
 ### Managing secrets in GitOps
 - Kubernetes secrets are not encrypted / base64 encoding used should be never seen as a security feature!!!
-- Install [Bitnami Sealed Secrets](https://github.com/bitnami-labs/sealed-secrets):
+- Install [Bitnami Sealed Secrets](https://github.com/bitnami-labs/sealed-secrets) in the `kube-system` namespace:
+```
+argocd app create bitnami-sealed-controller --sync-policy auto --dest-namespace kube-system --dest-server https://kubernetes.default.svc \
+--repo https://github.com/codefresh-contrib/gitops-certification-examples \
+--path ./bitnami-sealed-controller
+```
+- Install with Helm (for reference):
 ```
 helm repo add sealed-secrets https://bitnami-labs.github.io/sealed-secrets
 helm repo update
@@ -63,9 +66,9 @@ helm install sealed-secrets-controller sealed-secrets/sealed-secrets
   - The private key for secret decryption, which should stay within the cluster, and never be shared.
 - [Process](https://learning.codefresh.io/path-player?courseid=gitops-fundamentals&unit=gitops-fundamentals_63a080ca69969Unit):
   - Create a plain Kubernetes secret locally: never commit it anywhere.
-  - Use kubeseal to encrypt the secret in a SealedSecret: `kubeseal -n my-namespace <.db-creds.yml> db-creds.json`
+  - Use kubeseal to encrypt the secret in a SealedSecret: `kubeseal < db-creds.yml > db-creds-encrypted.yaml -o yaml`
     - Sealed secrets are cluster and namespace specific! To use the same secret for different clusters, it must be encrypted for each cluster individually.
-  - Delete the original secret from your workstation and apply the sealed secret to the cluster: `k -n my-namespace apply -f db-creds.json`
+  - Delete the original secret from your workstation and apply the sealed secret to the cluster: `k [-n my-ns] apply -f db-creds-encrypted.yaml`
   - Commit the Sealed secret to Git.
   - Deploy your application that expects normal Kubernetes secrets to function.
   - The Bitnami Sealed Secrets controller decrypts the Sealed secrets and passes them to your application as plain secrets.
