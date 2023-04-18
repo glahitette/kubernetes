@@ -32,30 +32,25 @@
 argocd app create guestbook --repo https://github.com/argoproj/argocd-example-apps.git --path guestbook \
 --dest-namespace default --dest-server https://kubernetes.default.svc
 ```
-[//]: # (TODO: add createNS option)
-- Create application to `default` project, `argocd` namespace with auto sync policy, auto prune and self healing:
+- Create application from a Helm chart, to `helm-ns` namespace (will be created if missing) with auto sync policy, auto prune and self healing:
 ```
-argocd app create demo --sync-policy auto --dest-namespace argocd --dest-server https://kubernetes.default.svc \
---repo https://github.com/glahitette/gitops-certification-examples \
---path helm-app \
---sync-option Prune=true --self-heal
+argocd app create helm-guestbook --dest-namespace helm-ns --dest-server https://kubernetes.default.svc \
+--repo https://github.com/argoproj/argocd-example-apps.git \
+--path helm-guestbook --helm-set replicaCount=2
+--sync-option Prune=true,CreateNamespace=True --self-heal
 ```
-- Create a Helm application to `default` namespace
-```
-argocd app create helm-guestbook --repo https://github.com/argoproj/argocd-example-apps.git --path helm-guestbook \
---dest-namespace default --dest-server https://kubernetes.default.svc --helm-set replicaCount=2
-```
+  - Important note: Argo CD can deploy applications from Helm charts and monitor them for new versions / sync'ing. But the application is recognized as an Argo app, rendered with the Helm template, that can only be operated by Argo CD, and no longer a Helm application (`helmp list` returns empty).
 - List apps / sync app | get app details | get app history | delete app: `argocd app list`, `argocd app [sync | get | history | delete] demo`
 
 ### Managing secrets in GitOps
 - Kubernetes secrets are not encrypted / base64 encoding used should be never seen as a security feature!!!
-- Install [Bitnami Sealed Secrets](https://github.com/bitnami-labs/sealed-secrets) in the `kube-system` namespace:
+- Install [Bitnami Sealed Secrets](https://github.com/bitnami-labs/sealed-secrets)... in the `kube-system` namespace, as ArgoCD application...:
 ```
 argocd app create bitnami-sealed-controller --sync-policy auto --dest-namespace kube-system --dest-server https://kubernetes.default.svc \
 --repo https://github.com/codefresh-contrib/gitops-certification-examples \
 --path ./bitnami-sealed-controller
 ```
-- Install with Helm (for reference):
+- ...or with Helm (for reference):
 ```
 helm repo add sealed-secrets https://bitnami-labs.github.io/sealed-secrets
 helm repo update
